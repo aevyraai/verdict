@@ -1,0 +1,113 @@
+---
+title: CLI reference
+description: All commands and flags for the aevyra-verdict CLI.
+---
+
+## Installation
+
+The CLI is included with the package:
+
+```bash
+pip install aevyra-verdict
+aevyra-verdict --help
+```
+
+---
+
+## `run`
+
+Run evals on a dataset and print a comparison table.
+
+```bash
+aevyra-verdict run <dataset> [options]
+```
+
+### Models
+
+| Flag | Short | Description |
+|---|---|---|
+| `--model` | `-m` | Model in `provider/model` format. Repeat for multiple. |
+| `--config` | `-c` | Path to a models config file (`.yaml`, `.json`, `.toml`). |
+
+`--model` and `--config` are mutually exclusive.
+
+### Metrics
+
+| Flag | Description |
+|---|---|
+| `--metric` | Built-in metric: `rouge`, `bleu`, or `exact`. Repeat for multiple. Default: `rouge`. |
+| `--judge` | Add an LLM-as-judge using this model spec. |
+| `--judge-prompt` | Path to a custom judge prompt template (`.md` or `.txt`). |
+| `--custom-metric` | Custom scoring function in `file.py:function_name` format. Repeat for multiple. |
+
+### Output
+
+| Flag | Short | Description |
+|---|---|---|
+| `--output` | `-o` | Save results as JSON to this path. |
+
+### Tuning
+
+| Flag | Default | Description |
+|---|---|---|
+| `--max-workers` | `10` | Concurrent requests per model. Lower if hitting rate limits. |
+| `--temperature` | `0.0` | Sampling temperature. |
+| `--max-tokens` | `1024` | Max tokens per completion. |
+
+### Examples
+
+```bash
+# Compare two models
+aevyra-verdict run data.jsonl -m openai/gpt-4o -m anthropic/claude-sonnet-4-20250514
+
+# Use a config file
+aevyra-verdict run data.jsonl --config models.yaml
+
+# ROUGE + LLM judge, save results
+aevyra-verdict run data.jsonl -m openai/gpt-4o \
+  --metric rouge \
+  --judge openai/gpt-4o-mini \
+  -o results.json
+
+# Custom judge prompt and scoring function
+aevyra-verdict run data.jsonl -m openai/gpt-4o \
+  --judge openai/gpt-4o-mini \
+  --judge-prompt prompt.md \
+  --custom-metric my_metrics.py:brevity_score
+
+# Reduce concurrency if hitting rate limits
+aevyra-verdict run data.jsonl --config models.yaml --max-workers 3
+```
+
+---
+
+## `inspect`
+
+Preview a dataset without running any models.
+
+```bash
+aevyra-verdict inspect <dataset>
+```
+
+Shows sample count, whether reference answers are present, metadata keys, and the first sample.
+
+---
+
+## `providers`
+
+List all available providers and whether their API keys are configured.
+
+```bash
+aevyra-verdict providers
+```
+
+```
+Available providers:
+
+  openai       OPENAI_API_KEY         ✓ set
+  anthropic    ANTHROPIC_API_KEY      ✗ not set
+  google       GOOGLE_API_KEY         ✗ not set
+  mistral      MISTRAL_API_KEY        ✗ not set
+  cohere       COHERE_API_KEY         ✗ not set
+  openrouter   OPENROUTER_API_KEY     ✗ not set
+```

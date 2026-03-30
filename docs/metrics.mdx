@@ -1,0 +1,159 @@
+---
+title: Metrics
+description: Scoring model responses with built-in and custom metrics.
+---
+
+## Reference-based metrics
+
+These compare the model's output against a known-good `ideal` answer in the dataset.
+
+<AccordionGroup>
+  <Accordion title="ROUGE">
+    Measures word overlap between the response and the reference. Best for summarisation
+    and open-ended generation tasks where phrasing can vary.
+
+    ```python
+    from aevyra_verdict import RougeScore
+
+    RougeScore()                    # defaults to rougeL
+    RougeScore(variant="rouge1")    # unigram overlap
+    RougeScore(variant="rouge2")    # bigram overlap
+    RougeScore(variant="rougeL")    # longest common subsequence
+    ```
+
+    CLI: `--metric rouge`
+  </Accordion>
+
+  <Accordion title="BLEU">
+    N-gram precision with brevity penalty. More common in machine translation evals.
+
+    ```python
+    from aevyra_verdict import BleuScore
+
+    BleuScore()              # 4-gram BLEU by default
+    BleuScore(max_ngram=2)   # bigram BLEU
+    ```
+
+    CLI: `--metric bleu`
+  </Accordion>
+
+  <Accordion title="Exact match">
+    Binary score — 1.0 if the response matches the ideal exactly, 0.0 otherwise.
+    Useful for classification, short answers, and code generation with deterministic output.
+
+    ```python
+    from aevyra_verdict import ExactMatch
+
+    ExactMatch()                     # case-insensitive, strips whitespace
+    ExactMatch(case_sensitive=True)
+    ```
+
+    CLI: `--metric exact`
+  </Accordion>
+</AccordionGroup>
+
+## LLM-as-judge
+
+Uses a separate model to evaluate response quality on configurable criteria.
+Works with or without a reference answer.
+
+```python
+from aevyra_verdict import LLMJudge
+from aevyra_verdict.providers import get_provider
+
+judge = get_provider("openai", "gpt-4o-mini")
+LLMJudge(judge_provider=judge)
+```
+
+The judge scores on a 1–5 scale (normalized to 0.0–1.0) and returns its reasoning
+alongside the score.
+
+### Custom criteria
+
+```python
+LLMJudge(
+    judge_provider=judge,
+    criteria="Evaluate only factual accuracy. Ignore style and formatting.",
+)
+```
+
+### Custom prompt template
+
+For full control over the judge prompt, pass a `.md` file with these placeholders:
+`{criteria}`, `{conversation}`, `{response}`, `{ideal_section}`.
+
+```bash
+aevyra-verdict run data.jsonl -m openai/gpt-4o \
+  --judge openai/gpt-4o-mini \
+  --judge-prompt judge_prompt.md
+```
+
+`examples/judge_prompt.md` in the repo is a copy of the default template to start from.
+
+### CLI
+
+```bash
+# Default judge prompt
+aevyra-verdict run data.jsonl -m openai/gpt-4o --judge openai/gpt-4o-mini
+
+# Custom judge prompt file
+aevyra-verdict run data.jsonl -m openai/gpt-4o \
+  --judge openai/gpt-4o-mini \
+  --judge-prompt my_prompt.md
+```
+
+## Custom metrics
+
+Pass any Python function that takes `(response, ideal=None, messages=None, **kwargs)`
+and returns a `float` or a `dict` with a `"score"` key.
+
+```python
+from aevyra_verdict import CustomMetric
+
+def brevity_score(response, ideal=None, **kwargs):
+    words = len(response.split())
+    return 1.0 if words <= 150 else max(0.0, 1.0 - (words - 150) / 200)
+
+runner.add_metric(CustomMetric("brevity", brevity_score))
+```
+
+Return a dict to include reasoning:
+
+```python
+def contains_code(response, **kwargs):
+    has_code = "```" in response
+    return {
+        "score": 1.0 if has_code else 0.0,
+        "reasoning": "Contains code block" if has_code else "No code found",
+    }
+```
+
+### CLI
+
+Point at a Python file and name the function:
+
+```bash
+aevyra-verdict run data.jsonl -m openai/gpt-4o \
+  --custom-metric my_metrics.py:brevity_score \
+  --custom-metric my_metrics.py:contains_code
+```
+
+See `examples/custom_metrics.py` for three ready-to-use examples.
+
+## Combining metrics
+
+All metrics run on every sample. Results are reported per-metric in separate comparison tables.
+
+```python
+runner.add_metric(RougeScore())
+runner.add_metric(LLMJudge(judge_provider=judge))
+runner.add_metric(CustomMetric("brevity", brevity_score))
+```
+
+```bash
+aevyra-verdict run data.jsonl -m openai/gpt-4o \
+  --metric rouge \
+  --metric bleu \
+  --judge openai/gpt-4o-mini \
+  --custom-metric my_metrics.py:brevity_score
+```

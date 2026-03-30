@@ -1,0 +1,112 @@
+---
+title: Dataset
+description: Loading and working with eval datasets.
+---
+
+## Supported formats
+
+aevyra-verdict auto-detects the format from the first record. Pass `format=` explicitly
+if you need to override.
+
+<Tabs>
+  <Tab title="OpenAI">
+    The native format. Used by default.
+
+    ```json
+    {
+      "messages": [
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "What is the capital of France?"}
+      ],
+      "ideal": "The capital of France is Paris.",
+      "metadata": {"category": "factual", "difficulty": "easy"}
+    }
+    ```
+
+    | Field | Required | Description |
+    |---|---|---|
+    | `messages` | Yes | Array of `{role, content}` objects. Roles: `system`, `user`, `assistant`. |
+    | `ideal` | No | Reference answer. Required for ROUGE, BLEU, and exact match metrics. |
+    | `metadata` | No | Arbitrary key-value pairs for filtering and grouping. |
+  </Tab>
+
+  <Tab title="ShareGPT">
+    Common format for open source fine-tuning datasets on HuggingFace.
+
+    ```json
+    {
+      "conversations": [
+        {"from": "system", "value": "You are a helpful assistant."},
+        {"from": "human", "value": "What is the capital of France?"},
+        {"from": "gpt", "value": "The capital of France is Paris."}
+      ]
+    }
+    ```
+
+    The last assistant turn is automatically extracted as the `ideal` reference answer
+    and excluded from the prompt messages sent to the model. Any extra fields outside
+    `conversations` are preserved as metadata.
+
+    Supported role aliases: `human` / `user` → `user`, `gpt` / `assistant` / `chatgpt` / `bard` / `bing` → `assistant`.
+  </Tab>
+
+  <Tab title="Alpaca">
+    Standard instruction-following format used by Alpaca, WizardLM, and similar datasets.
+
+    ```json
+    {
+      "instruction": "Translate to French.",
+      "input": "Hello, how are you?",
+      "output": "Bonjour, comment allez-vous?"
+    }
+    ```
+
+    `instruction` and `input` are combined into a single user message using the standard
+    Alpaca template. `output` becomes the `ideal` reference answer. A `system` field is
+    extracted as a system message if present. `input` can be omitted for instruction-only samples.
+  </Tab>
+</Tabs>
+
+## Loading
+
+```python
+from aevyra_verdict import Dataset
+
+# Auto-detect format (default)
+dataset = Dataset.from_jsonl("data.jsonl")
+
+# Explicit format
+dataset = Dataset.from_jsonl("sharegpt_data.jsonl", format="sharegpt")
+dataset = Dataset.from_jsonl("alpaca_data.jsonl", format="alpaca")
+
+print(dataset.summary())
+# {'name': 'data', 'num_conversations': 50, 'has_ideals': True, 'metadata_keys': ['category']}
+```
+
+Or inline, without a file:
+
+```python
+dataset = Dataset.from_list([
+    {"messages": [{"role": "user", "content": "Hello"}], "ideal": "Hi there"},
+])
+
+# ShareGPT inline
+dataset = Dataset.from_list(sharegpt_records, format="sharegpt")
+```
+
+## Filtering
+
+Filter by any metadata field. Multiple filters are ANDed together.
+
+```python
+hard = dataset.filter(difficulty="hard")
+reasoning = dataset.filter(category="reasoning", difficulty="hard")
+```
+
+## CLI
+
+Preview a dataset without running any models:
+
+```bash
+aevyra-verdict inspect dataset.jsonl
+```

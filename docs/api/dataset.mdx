@@ -1,0 +1,89 @@
+---
+title: Dataset
+description: API reference for the Dataset and Conversation classes.
+---
+
+## Dataset
+
+```python
+from aevyra_verdict import Dataset
+```
+
+### `Dataset.from_jsonl(path, name=None, format="auto")`
+
+Load a dataset from a JSONL file.
+
+```python
+dataset = Dataset.from_jsonl("data.jsonl")
+dataset = Dataset.from_jsonl("data.jsonl", name="my-dataset")
+
+# Explicit format
+dataset = Dataset.from_jsonl("sharegpt_data.jsonl", format="sharegpt")
+dataset = Dataset.from_jsonl("alpaca_data.jsonl", format="alpaca")
+```
+
+| Parameter | Default | Description |
+|---|---|---|
+| `path` | — | Path to the JSONL file. |
+| `name` | filename stem | Display name for the dataset. |
+| `format` | `"auto"` | Input format: `"auto"`, `"openai"`, `"sharegpt"`, or `"alpaca"`. |
+
+### `Dataset.from_list(items, name="inline", format="auto")`
+
+Create a dataset from a list of dicts (same schema as JSONL lines).
+
+```python
+dataset = Dataset.from_list([
+    {"messages": [{"role": "user", "content": "Hello"}], "ideal": "Hi"},
+])
+
+# ShareGPT inline
+dataset = Dataset.from_list(sharegpt_records, format="sharegpt")
+```
+
+| Parameter | Default | Description |
+|---|---|---|
+| `items` | — | List of records in OpenAI, ShareGPT, or Alpaca format. |
+| `name` | `"inline"` | Display name for the dataset. |
+| `format` | `"auto"` | Input format: `"auto"`, `"openai"`, `"sharegpt"`, or `"alpaca"`. |
+```
+
+### `dataset.filter(**kwargs)`
+
+Return a new dataset containing only conversations where metadata matches all given key-value pairs.
+
+```python
+hard = dataset.filter(difficulty="hard")
+hard_reasoning = dataset.filter(difficulty="hard", category="reasoning")
+```
+
+### `dataset.summary()`
+
+Return a dict with name, sample count, whether ideals are present, and metadata keys.
+
+```python
+{
+    "name": "data",
+    "num_conversations": 50,
+    "has_ideals": True,
+    "metadata_keys": ["category", "difficulty"]
+}
+```
+
+### `dataset.has_ideals()`
+
+Return `True` if every conversation has an `ideal` field.
+
+---
+
+## Conversation
+
+Each item in a dataset is a `Conversation`:
+
+| Property | Type | Description |
+|---|---|---|
+| `messages` | `list[Message]` | The conversation messages. |
+| `ideal` | `str \| None` | The reference answer. |
+| `metadata` | `dict` | Arbitrary metadata. |
+| `prompt_messages` | `list[dict]` | Messages as plain dicts, ready to send to a provider. |
+| `last_user_message` | `str \| None` | The last user message in the conversation. |

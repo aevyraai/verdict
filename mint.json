@@ -1,0 +1,54 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "aevyra-verdict",
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#6E3FF3",
+    "light": "#A78BFA",
+    "dark": "#4C1D95",
+    "background": {
+      "dark": "#0D0D0F"
+    }
+  },
+  "topbarLinks": [
+    {
+      "name": "GitHub",
+      "url": "https://github.com/aevyraai/evals"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "aevyraai",
+    "url": "https://github.com/aevyraai"
+  },
+  "navigation": [
+    {
+      "group": "Getting started",
+      "pages": ["docs/introduction", "docs/quickstart"]
+    },
+    {
+      "group": "Guides",
+      "pages": [
+        "docs/dataset",
+        "docs/providers",
+        "docs/metrics",
+        "docs/cli",
+        "docs/configuration"
+      ]
+    },
+    {
+      "group": "API reference",
+      "pages": [
+        "docs/api/dataset",
+        "docs/api/runner",
+        "docs/api/results"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "github": "https://github.com/aevyraai"
+  }
+}

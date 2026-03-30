@@ -1,0 +1,35 @@
+# models.yaml — specify which models to compare in an eval run
+#
+# Usage:
+#   aevyra-verdict run dataset.jsonl --config models.yaml
+
+models:
+  - provider: openai
+    model: gpt-4o
+    label: gpt-4o          # optional display name in results
+
+  - provider: anthropic
+    model: claude-sonnet-4-20250514
+    label: claude-sonnet
+
+  - provider: google
+    model: gemini-2.0-flash
+    label: gemini-flash
+
+  # OpenRouter — access 200+ models with a single API key (openrouter.ai)
+  # Requires OPENROUTER_API_KEY. Model names follow 'provider/model' format.
+  # - provider: openrouter
+  #   model: meta-llama/llama-3.1-8b-instruct
+  #   label: llama-openrouter
+  #
+  # - provider: openrouter
+  #   model: mistralai/mistral-large
+  #   label: mistral-openrouter
+
+  # Local vLLM instance — uses the OpenAI-compatible API
+  # Start vLLM with: vllm serve meta-llama/Llama-3.1-8B-Instruct
+  # - provider: openai
+  #   model: meta-llama/Llama-3.1-8B-Instruct
+  #   base_url: http://localhost:8000/v1
+  #   api_key: "none"          # vLLM doesn't require a real key
+  #   label: llama-local

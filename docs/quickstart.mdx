@@ -1,0 +1,64 @@
+---
+title: Quick start
+description: Run your first eval in under 5 minutes.
+---
+
+## Install
+
+```bash
+pip install aevyra-verdict
+```
+
+## Set your API keys
+
+```bash
+export OPENAI_API_KEY=sk-...
+export ANTHROPIC_API_KEY=sk-ant-...
+```
+
+Run `aevyra-verdict providers` to see which keys are configured.
+
+## Prepare a dataset
+
+Create a JSONL file where each line is a conversation in OpenAI message format.
+The `ideal` field is the reference answer used by scoring metrics.
+
+```json
+{"messages": [{"role": "user", "content": "What is the capital of France?"}], "ideal": "Paris"}
+{"messages": [{"role": "user", "content": "Explain binary search in one sentence."}], "ideal": "Binary search repeatedly halves a sorted array to find a target value in O(log n) time."}
+```
+
+## Run your first eval
+
+```bash
+aevyra-verdict run dataset.jsonl -m openai/gpt-4o -m anthropic/claude-sonnet-4-20250514
+```
+
+You'll see a progress bar and a comparison table when it finishes:
+
+```
+Eval: dataset | Metric: rouge_rougeL
+------------------------------------------------------------------------
+Model                               Mean     Stdev    Latency   Errors
+------------------------------------------------------------------------
+openai/gpt-4o                     0.7823      N/A    312.4ms        0
+anthropic/claude-sonnet-4-...     0.7541      N/A    289.1ms        0
+------------------------------------------------------------------------
+```
+
+## Save results
+
+```bash
+aevyra-verdict run dataset.jsonl -m openai/gpt-4o -o results.json
+```
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Compare more models" icon="layer-group" href="/docs/providers">
+    Use a config file to manage multiple models including local vLLM instances
+  </Card>
+  <Card title="Add an LLM judge" icon="gavel" href="/docs/metrics">
+    Score responses with Claude or GPT instead of reference-based metrics
+  </Card>
+</CardGroup>

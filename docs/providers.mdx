@@ -1,0 +1,151 @@
+---
+title: Providers
+description: Configuring models and API providers.
+---
+
+## Built-in providers
+
+| Provider | Name | Env var |
+|---|---|---|
+| OpenAI | `openai` | `OPENAI_API_KEY` |
+| Anthropic | `anthropic` | `ANTHROPIC_API_KEY` |
+| Google Gemini | `google` | `GOOGLE_API_KEY` |
+| Mistral | `mistral` | `MISTRAL_API_KEY` |
+| Cohere | `cohere` | `COHERE_API_KEY` |
+| OpenRouter | `openrouter` | `OPENROUTER_API_KEY` |
+
+Check which keys are configured:
+
+```bash
+aevyra-verdict providers
+```
+
+## Inline flags
+
+Pass `--model` (or `-m`) once per model in `provider/model` format:
+
+```bash
+aevyra-verdict run data.jsonl \
+  -m openai/gpt-4o \
+  -m anthropic/claude-sonnet-4-20250514 \
+  -m google/gemini-2.0-flash
+```
+
+## Config file
+
+For more than a couple of models, use a config file. Supports `.yaml`, `.json`, and `.toml`.
+
+```bash
+aevyra-verdict run data.jsonl --config models.yaml
+```
+
+```yaml
+# models.yaml
+models:
+  - provider: openai
+    model: gpt-4o
+    label: gpt-4o
+
+  - provider: anthropic
+    model: claude-sonnet-4-20250514
+    label: claude-sonnet
+
+  - provider: openrouter
+    model: meta-llama/llama-3.1-8b-instruct
+    label: llama-openrouter
+```
+
+The `label` field sets the display name in results. It's optional — defaults to `provider/model`.
+
+## OpenRouter
+
+[OpenRouter](https://openrouter.ai) gives you access to 200+ models across every major
+provider with a single API key. Model names follow the `provider/model` format listed
+on [openrouter.ai/models](https://openrouter.ai/models).
+
+```bash
+aevyra-verdict run data.jsonl -m openrouter/mistralai/mistral-large
+```
+
+```python
+from aevyra_verdict.providers import get_provider
+
+provider = get_provider(
+    "openrouter",
+    "meta-llama/llama-3.1-8b-instruct",
+    site_url="https://yoursite.com",  # optional, for OpenRouter analytics
+    app_name="aevyra-verdict",
+)
+```
+
+## Local models (vLLM / Ollama)
+
+Any OpenAI-compatible local server works via the `openai` provider with a custom `base_url`.
+
+<Tabs>
+  <Tab title="vLLM">
+    Start the server:
+    ```bash
+    vllm serve meta-llama/Llama-3.1-8B-Instruct
+    ```
+
+    Config entry:
+    ```yaml
+    - provider: openai
+      model: meta-llama/Llama-3.1-8B-Instruct
+      base_url: http://localhost:8000/v1
+      api_key: "none"
+      label: llama-local
+    ```
+  </Tab>
+  <Tab title="Ollama">
+    Start the server:
+    ```bash
+    ollama serve
+    ```
+
+    Config entry:
+    ```yaml
+    - provider: openai
+      model: llama3.1
+      base_url: http://localhost:11434/v1
+      api_key: "ollama"
+      label: llama-ollama
+    ```
+  </Tab>
+</Tabs>
+
+## Custom providers
+
+Subclass `Provider` and register it:
+
+```python
+from aevyra_verdict.providers import Provider, register_provider, CompletionResult
+
+class MyProvider(Provider):
+    name = "my_provider"
+
+    def complete(self, messages, temperature=0.0, max_tokens=1024, **kwargs):
+        # call your API here
+        return CompletionResult(
+            text="response text",
+            model=self.model,
+            provider=self.name,
+            latency_ms=100.0,
+        )
+
+register_provider("my_provider", MyProvider)
+```
+
+## Python API
+
+```python
+from aevyra_verdict.providers import get_provider
+
+provider = get_provider("openai", "gpt-4o")
+result = provider.complete([{"role": "user", "content": "Hello"}])
+
+print(result.text)
+print(result.latency_ms)
+print(result.usage)  # {"prompt_tokens": 10, "completion_tokens": 5}
+```

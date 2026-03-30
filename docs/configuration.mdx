@@ -1,0 +1,82 @@
+---
+title: Configuration
+description: Tuning concurrency, retries, and rate-limit handling.
+---
+
+## RunConfig
+
+All runner behaviour is controlled through `RunConfig`:
+
+```python
+from aevyra_verdict.runner import EvalRunner, RunConfig
+
+config = RunConfig(
+    temperature=0.0,
+    max_tokens=1024,
+    max_workers=10,
+    max_model_workers=4,
+    num_retries=4,
+    retry_base_delay=1.0,
+    retry_max_delay=60.0,
+    retry_jitter=0.25,
+)
+runner = EvalRunner(config=config)
+```
+
+## Concurrency
+
+aevyra-verdict runs requests concurrently at two levels:
+
+- **`max_workers`** — concurrent requests per model (default: `10`)
+- **`max_model_workers`** — models evaluated at the same time (default: `4`)
+
+So with 3 models and `max_workers=10`, up to 30 API calls can be in-flight simultaneously.
+
+If you're hitting rate limits, lower `max_workers` first:
+
+```python
+config = RunConfig(max_workers=3)
+```
+
+## Rate limit handling
+
+Rate-limit errors (HTTP 429) are automatically retried with exponential backoff and jitter.
+The delay before retry `n` is:
+
+```
+delay = min(base_delay × 2ⁿ, max_delay) ± jitter
+```
+
+With the defaults (`base_delay=1.0`, `max_delay=60.0`, `jitter=0.25`), the sequence is roughly:
+1s → 2s → 4s → 8s → 16s → 32s → 60s (capped).
+
+Jitter adds ±25% randomness to prevent multiple concurrent workers from retrying in sync.
+
+<Note>
+  Auth errors (401, 403) and bad requests (400) are surfaced immediately without retrying —
+  there's no point burning retry budget on errors that won't resolve themselves.
+</Note>
+
+## Tuning for large datasets
+
+For large datasets (1000+ samples), these settings tend to work well:
+
+```python
+config = RunConfig(
+    max_workers=20,          # increase if your API quota allows
+    max_model_workers=2,     # fewer models in parallel reduces peak load
+    num_retries=6,           # more retries for long runs
+    retry_base_delay=2.0,    # start backing off more aggressively
+    retry_max_delay=120.0,
+)
+```
+
+## CLI tuning
+
+```bash
+# Reduce concurrency
+aevyra-verdict run data.jsonl --config models.yaml --max-workers 3
+
+# Deterministic outputs
+aevyra-verdict run data.jsonl -m openai/gpt-4o --temperature 0.0
+```

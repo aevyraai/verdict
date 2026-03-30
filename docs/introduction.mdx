@@ -1,0 +1,43 @@
+---
+title: Introduction
+description: A framework for comparing LLM outputs across models and providers.
+---
+
+aevyra-verdict runs completions against any combination of models, scores the responses
+with pluggable metrics, and gives you structured results for comparison — from the
+terminal or in Python.
+
+## What it does
+
+Given a dataset of prompts in OpenAI message format, aevyra-verdict:
+
+1. Sends each prompt to every model you've configured, concurrently
+2. Scores each response with your chosen metrics (ROUGE, BLEU, exact match, LLM-as-judge, or custom Python functions)
+3. Returns a comparison table with scores, latency, and token usage per model
+
+## When to use it
+
+- Choosing between models for a specific task
+- Catching regressions after a prompt or model change
+- Measuring the effect of system prompt variations
+- Benchmarking a locally-running model against hosted APIs
+
+## Supported providers
+
+OpenAI, Anthropic, Google (Gemini), Mistral, Cohere, OpenRouter, and any
+OpenAI-compatible API (vLLM, Ollama, Together, etc.).
+
+<CardGroup cols={2}>
+  <Card title="Quick start" icon="bolt" href="/docs/quickstart">
+    Run your first eval in under 5 minutes
+  </Card>
+  <Card title="CLI reference" icon="terminal" href="/docs/cli">
+    All commands and flags
+  </Card>
+  <Card title="Providers" icon="server" href="/docs/providers">
+    Configure models and local instances
+  </Card>
+  <Card title="Metrics" icon="chart-bar" href="/docs/metrics">
+    ROUGE, BLEU, LLM-as-judge, custom functions
+  </Card>
+</CardGroup>

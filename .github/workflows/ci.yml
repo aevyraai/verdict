@@ -1,0 +1,120 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 9 * * 1"  # Every Monday at 9am UTC
+  workflow_dispatch:  # Enables "Run workflow" button in the Actions tab
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Unit tests — no API keys or services needed, always runs
+  # ---------------------------------------------------------------------------
+  unit:
+    name: Unit tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install package
+        run: pip install -e ".[dev]"
+
+      - name: Run unit tests
+        run: pytest tests/test_dataset.py -v
+
+  # ---------------------------------------------------------------------------
+  # Ollama integration — pulls a small model, free, no secrets needed
+  # ---------------------------------------------------------------------------
+  ollama:
+    name: Ollama integration
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install package
+        run: pip install -e ".[dev]"
+
+      - name: Install Ollama
+        run: curl -fsSL https://ollama.com/install.sh | sh
+
+      - name: Pull model
+        run: ollama pull llama3.2:1b
+
+      - name: Start Ollama server
+        run: ollama serve &
+        # Give it a moment to start
+
+      - name: Wait for Ollama to be ready
+        run: |
+          for i in $(seq 1 15); do
+            curl -s http://localhost:11434/api/tags && break
+            echo "Waiting for Ollama... ($i)"
+            sleep 2
+          done
+
+      - name: Run Ollama tests
+        run: pytest tests/test_integration.py -m ollama -v
+
+  # ---------------------------------------------------------------------------
+  # OpenRouter integration — uses free-tier model, needs secret
+  # ---------------------------------------------------------------------------
+  openrouter:
+    name: OpenRouter integration
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install package
+        run: pip install -e ".[dev]"
+
+      - name: Run OpenRouter tests
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: pytest tests/test_integration.py -m openrouter -v
+
+  # ---------------------------------------------------------------------------
+  # OpenAI integration — uses gpt-4o-mini, needs secret
+  # Runs only on push to main to avoid spending credits on every PR
+  # ---------------------------------------------------------------------------
+  openai:
+    name: OpenAI integration
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install package
+        run: pip install -e ".[dev]"
+
+      - name: Run OpenAI tests
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: pytest tests/test_integration.py -m openai -v

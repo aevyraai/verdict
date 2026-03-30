@@ -1,0 +1,91 @@
+---
+title: EvalResults
+description: API reference for EvalResults and ModelResult.
+---
+
+## EvalResults
+
+Returned by `EvalRunner.run()`. Contains per-model results and aggregate comparisons.
+
+```python
+results = runner.run(dataset)
+```
+
+### `.compare(metric_name=None)`
+
+Return a formatted comparison table as a string. Uses the first metric if none specified.
+
+```python
+print(results.compare())
+print(results.compare("rouge_rougeL"))
+print(results.compare("llm_judge"))
+```
+
+### `.summary()`
+
+Return a dict of per-model aggregate stats (mean score, stdev, latency, token usage).
+
+```python
+summary = results.summary()
+# {
+#   "openai/gpt-4o": {
+#     "provider": "openai",
+#     "model": "gpt-4o",
+#     "success_rate": 1.0,
+#     "mean_latency_ms": 312.4,
+#     "total_tokens": 4821,
+#     "rouge_rougeL_mean": 0.782,
+#     "rouge_rougeL_stdev": 0.134,
+#   },
+#   ...
+# }
+```
+
+### `.to_dataframe()`
+
+Convert the summary to a pandas DataFrame for further analysis.
+
+```python
+df = results.to_dataframe()
+print(df.sort_values("rouge_rougeL_mean", ascending=False))
+```
+
+### `.to_json(path=None)`
+
+Export full results (summary + per-sample data) as JSON. Returns the JSON string.
+
+```python
+results.to_json("results.json")
+json_str = results.to_json()
+```
+
+### Properties
+
+| Property | Description |
+|---|---|
+| `results.models` | List of model labels. |
+| `results.metric_names` | List of metric names used in this run. |
+| `results.model_results` | Dict mapping label → `ModelResult`. |
+
+---
+
+## ModelResult
+
+Per-model results accessible via `results.model_results["label"]`.
+
+| Method | Description |
+|---|---|
+| `.mean_score(metric_name)` | Mean score for a metric across all samples. |
+| `.median_score(metric_name)` | Median score. |
+| `.stdev_score(metric_name)` | Standard deviation. |
+| `.mean_latency_ms()` | Mean API latency in milliseconds. |
+| `.total_tokens()` | Total tokens used across all completions. |
+
+| Property | Description |
+|---|---|
+| `.num_samples` | Total samples evaluated. |
+| `.num_errors` | Samples that failed after all retries. |
+| `.success_rate` | Fraction of samples that completed without error. |
+| `.completions` | List of `CompletionResult` objects (one per sample). |
+| `.scores` | List of `{metric_name: ScoreResult}` dicts (one per sample). |
+| `.errors` | List of error strings or `None` (one per sample). |

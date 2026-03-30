@@ -1,0 +1,82 @@
+---
+title: EvalRunner
+description: API reference for EvalRunner and RunConfig.
+---
+
+## EvalRunner
+
+```python
+from aevyra_verdict import EvalRunner
+```
+
+The runner orchestrates completions and scoring across all configured models and metrics.
+
+### `EvalRunner(config=None)`
+
+```python
+from aevyra_verdict.runner import RunConfig
+
+runner = EvalRunner()
+runner = EvalRunner(config=RunConfig(max_workers=5))
+```
+
+### `.add_provider(provider_name, model, *, label=None, api_key=None, base_url=None)`
+
+Add a model to evaluate. Returns `self` for chaining.
+
+```python
+runner.add_provider("openai", "gpt-4o")
+runner.add_provider("anthropic", "claude-sonnet-4-20250514", label="claude")
+runner.add_provider("openai", "llama", base_url="http://localhost:8000/v1", api_key="none")
+```
+
+### `.add_provider_instance(label, provider)`
+
+Add a pre-configured `Provider` instance.
+
+```python
+from aevyra_verdict.providers import get_provider
+
+provider = get_provider("openrouter", "meta-llama/llama-3.1-8b-instruct")
+runner.add_provider_instance("llama-openrouter", provider)
+```
+
+### `.add_metric(metric)`
+
+Add a scoring metric. Returns `self` for chaining.
+
+```python
+from aevyra_verdict import RougeScore, LLMJudge
+from aevyra_verdict.providers import get_provider
+
+runner.add_metric(RougeScore())
+runner.add_metric(LLMJudge(judge_provider=get_provider("openai", "gpt-4o-mini")))
+```
+
+### `.run(dataset, show_progress=True)`
+
+Run the eval. Returns an `EvalResults` object.
+
+```python
+results = runner.run(dataset)
+results = runner.run(dataset, show_progress=False)
+```
+
+---
+
+## RunConfig
+
+```python
+from aevyra_verdict.runner import RunConfig
+```
+
+| Parameter | Default | Description |
+|---|---|---|
+| `temperature` | `0.0` | Sampling temperature for completions. |
+| `max_tokens` | `1024` | Max tokens per completion. |
+| `max_workers` | `10` | Concurrent requests per model. |
+| `max_model_workers` | `4` | Models evaluated concurrently. |
+| `num_retries` | `4` | Retry attempts after the first failure. |
+| `retry_base_delay` | `1.0` | Initial backoff delay in seconds. |
+| `retry_max_delay` | `60.0` | Maximum backoff delay in seconds. |
+| `retry_jitter` | `0.25` | ±fraction of random jitter added to each delay. |
