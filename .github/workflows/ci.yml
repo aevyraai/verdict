@@ -67,7 +67,7 @@ jobs:
         run: ollama pull llama3.2:1b
 
       - name: Run Ollama tests
-        run: pytest tests/test_integration.py -m ollama -v
+        run: pytest tests/test_ollama.py -v
 
   # ---------------------------------------------------------------------------
   # vLLM integration — CPU-only with a tiny model, no secrets needed
@@ -86,6 +86,14 @@ jobs:
 
       - name: Install package
         run: pip install -e ".[dev]"
+
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          df -h
 
       - name: Install vLLM
         run: pip install vllm
@@ -110,7 +118,7 @@ jobs:
         env:
           VLLM_MODEL: facebook/opt-125m
           VLLM_BASE_URL: http://localhost:8000/v1
-        run: pytest tests/test_integration.py -m vllm -v
+        run: pytest tests/test_vllm.py -v
 
   # ---------------------------------------------------------------------------
   # OpenRouter integration — uses free-tier model, needs secret
@@ -118,7 +126,6 @@ jobs:
   openrouter:
     name: OpenRouter integration
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
       - uses: actions/checkout@v4
@@ -141,7 +148,7 @@ jobs:
       - name: Run OpenRouter tests
         env:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-        run: pytest tests/test_integration.py -m openrouter -v
+        run: pytest tests/test_openrouter.py -v
 
   # ---------------------------------------------------------------------------
   # OpenAI integration — uses gpt-4o-mini, needs secret
@@ -150,7 +157,6 @@ jobs:
   openai:
     name: OpenAI integration
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
       - uses: actions/checkout@v4
@@ -173,4 +179,4 @@ jobs:
       - name: Run OpenAI tests
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: pytest tests/test_integration.py -m openai -v
+        run: pytest tests/test_openai.py -v
