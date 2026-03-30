@@ -95,8 +95,8 @@ jobs:
           sudo rm -rf /opt/hostedtoolcache/CodeQL
           df -h
 
-      - name: Install vLLM
-        run: pip install vllm
+      - name: Install vLLM (CPU only)
+        run: pip install vllm --extra-index-url https://download.pytorch.org/whl/cpu
 
       - name: Start vLLM server
         run: |
