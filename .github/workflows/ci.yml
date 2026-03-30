@@ -95,6 +95,12 @@ jobs:
           sudo rm -rf /opt/hostedtoolcache/CodeQL
           df -h
 
+      - name: Cache HuggingFace model
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-facebook-opt-125m
+
       - name: Install vLLM (CPU only)
         run: pip install vllm --extra-index-url https://download.pytorch.org/whl/cpu
 
@@ -104,15 +110,22 @@ jobs:
             --model facebook/opt-125m \
             --port 8000 \
             --device cpu \
-            --dtype float32 &
+            --dtype float32 > /tmp/vllm.log 2>&1 &
+          echo $! > /tmp/vllm.pid
 
       - name: Wait for vLLM to be ready
         run: |
-          for i in $(seq 1 30); do
-            curl -s http://localhost:8000/health && break
-            echo "Waiting for vLLM... ($i)"
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:8000/health; then
+              echo "vLLM is ready after $((i * 5))s"
+              exit 0
+            fi
+            echo "Waiting for vLLM... ($i/60)"
             sleep 5
           done
+          echo "vLLM failed to start after 5 minutes. Last logs:"
+          tail -50 /tmp/vllm.log
+          exit 1
 
       - name: Run vLLM tests
         env:
