@@ -1,2 +1,0 @@
-[console_scripts]
-aevyra-verdict = aevyra_verdict.cli:main

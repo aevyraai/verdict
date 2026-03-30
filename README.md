@@ -1,9 +1,21 @@
 # aevyra-verdict
 
+[![CI](https://github.com/aevyraai/verdict/actions/workflows/ci.yml/badge.svg)](https://github.com/aevyraai/verdict/actions/workflows/ci.yml)
+
 A Python framework for comparing LLM outputs across models and providers. Given a
 dataset of prompts (OpenAI, ShareGPT, or Alpaca format), it runs completions against any
 combination of models, scores the responses with pluggable metrics, and gives you
 structured results for comparison.
+
+## Use cases
+
+**Finding the best model for your use case.** Instead of manually testing models one by
+one, run your actual prompts across all of them at once and get an objective, scored
+comparison.
+
+**Benchmarking an open-source model against closed ones.** If you have a target OSS
+model in mind, measure how it performs against SOTA closed models on your specific
+workload — and identify exactly where the gap is so you know what to improve.
 
 ## Install
 
@@ -16,17 +28,15 @@ You only need API keys for the providers you actually use.
 
 ## Quick start
 
-The fastest way to get going is the CLI:
-
 ```bash
-# Compare two models on a dataset
-aevyra-verdict run dataset.jsonl -m openai/gpt-4o -m anthropic/claude-sonnet-4-20250514
-
-# Preview a dataset before running
-aevyra-verdict inspect dataset.jsonl
-
-# Check which API keys are configured
+# 1. Check which API keys are configured
 aevyra-verdict providers
+
+# 2. Compare models on a dataset and save results
+aevyra-verdict run dataset.jsonl \
+  -m openai/gpt-4o \
+  -m anthropic/claude-sonnet-4-20250514 \
+  -o results.json
 ```
 
 Or use the Python API directly:
@@ -73,6 +83,36 @@ latency.
 thread pools. Rate-limit errors (HTTP 429) trigger exponential backoff with jitter
 before retrying; fatal errors (auth failures, bad requests) are surfaced immediately
 without burning retry budget. Results land in `EvalResults`.
+
+```mermaid
+flowchart LR
+    DS[(Dataset\nJSONL / ShareGPT / Alpaca)]:::data
+
+    subgraph runner["⚡ EvalRunner (concurrent)"]
+        direction TB
+        MA["Model A"]:::model
+        MB["Model B"]:::model
+        MC["Model C"]:::model
+    end
+
+    subgraph metrics["📊 Metrics"]
+        direction TB
+        R["ROUGE / BLEU"]:::metric
+        J["LLM Judge"]:::metric
+        C["Custom Python fn"]:::metric
+    end
+
+    OUT["Results\ncomparison table · JSON export"]:::output
+
+    DS --> runner
+    runner --> metrics
+    metrics --> OUT
+
+    classDef data    fill:#6E3FF3,color:#fff,stroke:none
+    classDef model   fill:#9B6BFF,color:#fff,stroke:none
+    classDef metric  fill:#3FBFFF,color:#fff,stroke:none
+    classDef output  fill:#2ECC71,color:#fff,stroke:none
+```
 
 ## Usage
 
@@ -213,6 +253,22 @@ Custom functions return either a `float` or a `dict` with at least a `"score"` k
 ## CLI
 
 After `pip install -e .`, the `aevyra-verdict` command is available.
+
+### Inspect a dataset
+
+Preview a dataset before running — shows sample count, whether ideals are present, and the first sample. No API calls made.
+
+```bash
+aevyra-verdict inspect dataset.jsonl
+```
+
+### Check configured providers
+
+List all available providers and whether their API keys are set:
+
+```bash
+aevyra-verdict providers
+```
 
 ### Specifying models
 

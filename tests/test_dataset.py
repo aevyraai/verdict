@@ -6,7 +6,11 @@ import json
 
 import pytest
 
+from pathlib import Path
+
 from aevyra_verdict.dataset import Dataset
+
+GSM8K_PATH = Path(__file__).parent.parent / "examples" / "gsm8k_sample.jsonl"
 
 
 # ---------------------------------------------------------------------------
@@ -101,6 +105,53 @@ class TestShareGPTFormat:
         ds = Dataset.from_list(items, format="sharegpt")
         assert len(ds) == 1
         assert ds[0].ideal == "Hello!"
+
+
+# ---------------------------------------------------------------------------
+# GSM8K sample dataset
+# ---------------------------------------------------------------------------
+
+class TestGSM8KSample:
+    def test_file_exists(self):
+        assert GSM8K_PATH.exists(), (
+            f"GSM8K sample not found at {GSM8K_PATH}. "
+            "Run: python examples/fetch_gsm8k.py"
+        )
+
+    def test_loads_50_samples(self):
+        if not GSM8K_PATH.exists():
+            pytest.skip("gsm8k_sample.jsonl not present")
+        ds = Dataset.from_jsonl(GSM8K_PATH)
+        assert len(ds) == 50
+
+    def test_all_have_ideals(self):
+        if not GSM8K_PATH.exists():
+            pytest.skip("gsm8k_sample.jsonl not present")
+        ds = Dataset.from_jsonl(GSM8K_PATH)
+        assert ds.has_ideals()
+        assert all(s.ideal for s in ds)
+
+    def test_all_have_system_prompt(self):
+        if not GSM8K_PATH.exists():
+            pytest.skip("gsm8k_sample.jsonl not present")
+        ds = Dataset.from_jsonl(GSM8K_PATH)
+        for sample in ds:
+            assert sample.messages[0].role == "system"
+
+    def test_metadata_source_is_gsm8k(self):
+        if not GSM8K_PATH.exists():
+            pytest.skip("gsm8k_sample.jsonl not present")
+        ds = Dataset.from_jsonl(GSM8K_PATH)
+        assert all(s.metadata.get("source") == "gsm8k" for s in ds)
+
+    def test_ideals_are_numbers(self):
+        if not GSM8K_PATH.exists():
+            pytest.skip("gsm8k_sample.jsonl not present")
+        ds = Dataset.from_jsonl(GSM8K_PATH)
+        for sample in ds:
+            # GSM8K ideals should be numeric strings
+            assert sample.ideal.replace(",", "").replace(".", "").lstrip("-").isdigit(), \
+                f"Non-numeric ideal: {sample.ideal!r}"
 
 
 # ---------------------------------------------------------------------------
