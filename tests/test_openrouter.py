@@ -9,7 +9,7 @@ from aevyra_verdict.dataset import Dataset
 from aevyra_verdict.providers import get_provider
 from aevyra_verdict.runner import EvalRunner, RunConfig
 
-OPENROUTER_MODEL = "meta-llama/llama-3.2-3b-instruct:free"
+OPENROUTER_MODEL = "google/gemini-2.0-flash-exp:free"
 TINY_PROMPT = [{"role": "user", "content": "Reply with just the word 'ok'."}]
 
 

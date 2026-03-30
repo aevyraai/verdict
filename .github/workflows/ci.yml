@@ -151,8 +151,7 @@ jobs:
         run: pytest tests/test_openrouter.py -v
 
   # ---------------------------------------------------------------------------
-  # OpenAI integration — uses gpt-4o-mini, needs secret
-  # Runs only on push to main to avoid spending credits on every PR
+  # OpenAI integration — uses gpt-4o-mini, needs secret + funded account
   # ---------------------------------------------------------------------------
   openai:
     name: OpenAI integration
