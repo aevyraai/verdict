@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="36" viewBox="0 0 160 36" fill="none">
+  <!-- Gavel icon -->
+  <g transform="translate(0, 4)">
+    <!-- Gavel head -->
+    <rect x="2" y="4" width="18" height="10" rx="2" fill="#4C1D95"/>
+    <!-- Gavel handle -->
+    <line x1="16" y1="14" x2="26" y2="24" stroke="#4C1D95" stroke-width="3" stroke-linecap="round"/>
+    <!-- Strike line -->
+    <line x1="2" y1="22" x2="12" y2="22" stroke="#6E3FF3" stroke-width="2" stroke-linecap="round"/>
+  </g>
+  <!-- "verdict" wordmark -->
+  <text x="36" y="25" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="600" fill="#1a1a2e" letter-spacing="-0.5">verdict</text>
+</svg>
