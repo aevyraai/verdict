@@ -32,11 +32,11 @@ You only need API keys for the providers you actually use.
 # 1. Check which API keys are configured
 aevyra-verdict providers
 
-# 2. Compare two models on a dataset
-aevyra-verdict run dataset.jsonl -m openai/gpt-4o -m anthropic/claude-sonnet-4-20250514
-
-# 3. Save results to JSON for further analysis
-aevyra-verdict run dataset.jsonl -m openai/gpt-4o -m openai/gpt-4o-mini -o results.json
+# 2. Compare models on a dataset and save results
+aevyra-verdict run dataset.jsonl \
+  -m openai/gpt-4o \
+  -m anthropic/claude-sonnet-4-20250514 \
+  -o results.json
 ```
 
 Or use the Python API directly:
