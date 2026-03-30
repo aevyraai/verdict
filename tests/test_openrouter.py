@@ -9,7 +9,7 @@ from aevyra_verdict.dataset import Dataset
 from aevyra_verdict.providers import get_provider
 from aevyra_verdict.runner import EvalRunner, RunConfig
 
-OPENROUTER_MODEL = "google/gemini-2.0-flash-exp:free"
+OPENROUTER_MODEL = "openrouter/free"  # auto-selects from available free models
 TINY_PROMPT = [{"role": "user", "content": "Reply with just the word 'ok'."}]
 
 
