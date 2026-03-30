@@ -90,8 +90,8 @@ class TestOllama:
 # vLLM
 # ---------------------------------------------------------------------------
 
-VLLM_MODEL = "meta-llama/Llama-3.2-1B"
-VLLM_BASE_URL = "http://localhost:8000/v1"
+VLLM_MODEL = os.environ.get("VLLM_MODEL", "meta-llama/Llama-3.2-1B")
+VLLM_BASE_URL = os.environ.get("VLLM_BASE_URL", "http://localhost:8000/v1")
 
 
 @pytest.mark.vllm
