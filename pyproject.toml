@@ -5,12 +5,27 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "aevyra-verdict"
 version = "0.1.0"
-description = "A framework for comparing LLM outputs across models and providers"
+description = "A framework for evaluating and comparing LLM outputs across models and providers"
 readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.10"
 authors = [
     { name = "Aevyra AI" },
+]
+keywords = [
+    "llm", "evals", "evaluation", "benchmarking", "llm-evaluation",
+    "model-comparison", "openai", "anthropic", "ollama", "vllm",
+    "rouge", "bleu", "llm-judge", "ai", "nlp",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
 ]
 
 dependencies = [

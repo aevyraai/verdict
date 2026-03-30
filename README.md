@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/aevyraai/verdict/actions/workflows/ci.yml/badge.svg)](https://github.com/aevyraai/verdict/actions/workflows/ci.yml)
 
-A Python framework for comparing LLM outputs across models and providers. Given a
+A Python framework for evaluating and comparing LLM outputs across models and providers. Given a
 dataset of prompts (OpenAI, ShareGPT, or Alpaca format), it runs completions against any
 combination of models, scores the responses with pluggable metrics, and gives you
 structured results for comparison.
