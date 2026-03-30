@@ -1,13 +1,28 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="160" height="36" viewBox="0 0 160 36" fill="none">
-  <!-- Gavel icon -->
-  <g transform="translate(0, 4)">
-    <!-- Gavel head -->
-    <rect x="2" y="4" width="18" height="10" rx="2" fill="#4C1D95"/>
-    <!-- Gavel handle -->
-    <line x1="16" y1="14" x2="26" y2="24" stroke="#4C1D95" stroke-width="3" stroke-linecap="round"/>
-    <!-- Strike line -->
-    <line x1="2" y1="22" x2="12" y2="22" stroke="#6E3FF3" stroke-width="2" stroke-linecap="round"/>
-  </g>
-  <!-- "verdict" wordmark -->
-  <text x="36" y="25" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="600" fill="#1a1a2e" letter-spacing="-0.5">verdict</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 44" width="200" height="44">
+  <defs>
+    <linearGradient id="tealG-l" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#007766"/>
+      <stop offset="50%"  stop-color="#006655"/>
+      <stop offset="100%" stop-color="#004433"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Mini black hole icon -->
+  <ellipse cx="22" cy="22" rx="18" ry="4" fill="none" stroke="#aa4400" stroke-width="2.5" opacity="0.5"/>
+  <ellipse cx="22" cy="22" rx="15" ry="3" fill="none" stroke="#cc5500" stroke-width="1.5" opacity="0.7"/>
+  <ellipse cx="22" cy="22" rx="12" ry="2.2" fill="none" stroke="#dd6600" stroke-width="1" opacity="0.85"/>
+  <line x1="4"  y1="18" x2="4"  y2="26" stroke="#0077aa" stroke-width="1" opacity="0.7"/>
+  <line x1="7"  y1="16" x2="7"  y2="28" stroke="#0088bb" stroke-width="1.1" opacity="0.8"/>
+  <line x1="10" y1="15" x2="10" y2="29" stroke="#0099cc" stroke-width="1.2" opacity="0.85"/>
+  <line x1="34" y1="15" x2="34" y2="29" stroke="#7722aa" stroke-width="1.2" opacity="0.85"/>
+  <line x1="37" y1="16" x2="37" y2="28" stroke="#6611aa" stroke-width="1.1" opacity="0.8"/>
+  <line x1="40" y1="18" x2="40" y2="26" stroke="#551199" stroke-width="1" opacity="0.7"/>
+  <circle cx="22" cy="22" r="7" fill="#111111"/>
+  <circle cx="22" cy="22" r="7" fill="none" stroke="#cc6600" stroke-width="0.8" opacity="0.6"/>
+
+  <!-- AEVYRA wordmark — darker teal for light backgrounds -->
+  <text x="52" y="29"
+    font-family="Palatino Linotype, Palatino, Book Antiqua, Georgia, serif"
+    font-size="22" font-weight="300" letter-spacing="5"
+    fill="url(#tealG-l)">AEVYRA</text>
 </svg>
