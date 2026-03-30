@@ -15,13 +15,13 @@ TINY_PROMPT = [{"role": "user", "content": "Reply with just the word 'ok'."}]
 
 def _run_one():
     p = get_provider("openrouter", OPENROUTER_MODEL)
-    return p.complete(TINY_PROMPT, max_tokens=16, temperature=0.0)
+    return p.complete(TINY_PROMPT, max_tokens=256, temperature=0.0)
 
 
 def _run_eval(dataset_path):
     from aevyra_verdict.metrics import RougeScore
     ds = Dataset.from_jsonl(dataset_path)
-    config = RunConfig(max_tokens=32, temperature=0.0, max_workers=2)
+    config = RunConfig(max_tokens=256, temperature=0.0, max_workers=2)
     runner = EvalRunner(config=config)
     runner.add_provider("openrouter", OPENROUTER_MODEL)
     runner.add_metric(RougeScore())
@@ -42,8 +42,8 @@ class TestOpenRouter:
         assert result.latency_ms > 0
 
     @skip_if_no_openrouter
-    def test_full_eval(self, tiny_dataset):
-        results = _run_eval(tiny_dataset)
+    def test_full_eval(self, gsm8k_dataset):
+        results = _run_eval(gsm8k_dataset)
         assert results is not None
         assert len(results.metric_names) > 0
 

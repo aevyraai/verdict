@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 
 import pytest
 
@@ -64,6 +65,21 @@ skip_if_no_openai = pytest.mark.skipif(
 # ---------------------------------------------------------------------------
 # Shared fixtures
 # ---------------------------------------------------------------------------
+
+GSM8K_PATH = Path(__file__).parent.parent / "examples" / "gsm8k_sample.jsonl"
+
+
+@pytest.fixture
+def gsm8k_dataset(tmp_path):
+    """First 5 samples from GSM8K — used for integration tests."""
+    import json
+    if not GSM8K_PATH.exists():
+        pytest.skip("gsm8k_sample.jsonl not present — run: python examples/fetch_gsm8k.py")
+    lines = GSM8K_PATH.read_text().splitlines()[:5]
+    path = tmp_path / "gsm8k_5.jsonl"
+    path.write_text("\n".join(lines))
+    return path
+
 
 @pytest.fixture
 def tiny_dataset(tmp_path):

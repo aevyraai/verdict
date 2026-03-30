@@ -49,7 +49,7 @@ class TestVLLM:
         assert result.latency_ms > 0
 
     @skip_if_no_vllm
-    def test_full_eval(self, tiny_dataset):
-        results = _run_eval(tiny_dataset)
+    def test_full_eval(self, gsm8k_dataset):
+        results = _run_eval(gsm8k_dataset)
         assert results is not None
         assert len(results.metric_names) > 0
