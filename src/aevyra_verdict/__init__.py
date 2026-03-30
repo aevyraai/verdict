@@ -1,4 +1,4 @@
-"""Aevyra Evals — a framework for running LLM evals across models and providers."""
+"""Aevyra Verdict — a framework for evaluating and comparing LLM outputs across models and providers."""
 
 from aevyra_verdict.dataset import Dataset, Conversation
 from aevyra_verdict.runner import EvalRunner
