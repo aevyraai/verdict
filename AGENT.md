@@ -286,37 +286,3 @@ runner.add_provider("local", "llama3.2:1b", api_key=None)
 runner.add_provider("local", "llama3.2:1b", base_url="http://localhost:11434/v1")
 ```
 
----
-
-## Using verdict in an agent loop (e.g. aevyra-reflex)
-
-The typical pattern for a prompt optimization agent:
-
-```python
-from aevyra_verdict import Dataset, EvalRunner, RougeScore, LLMJudge
-from aevyra_verdict.providers import get_provider
-
-def evaluate_prompt(system_prompt: str, dataset_path: str, model: str) -> float:
-    """Run verdict and return the mean score for a given system prompt."""
-    # Inject the prompt being tested as the system message
-    ds = Dataset.from_jsonl(dataset_path)
-    injected = Dataset.from_list([
-        {
-            "messages": [{"role": "system", "content": system_prompt}] + [
-                m for m in s.messages if m.role != "system"
-            ],
-            "ideal": s.ideal,
-        }
-        for s in ds
-    ])
-
-    runner = EvalRunner()
-    runner.add_provider(*model.split("/", 1))
-    runner.add_metric(RougeScore())
-
-    results = runner.run(injected)
-    return results.model_results[model].mean_score("rouge") or 0.0
-```
-
-Call `evaluate_prompt()` inside your optimization loop. Compare the returned score
-against the previous iteration to decide whether the new prompt is better.
