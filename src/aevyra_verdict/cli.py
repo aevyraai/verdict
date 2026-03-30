@@ -462,8 +462,12 @@ def providers() -> None:
             is_set = "✓ set" if os.environ.get(env_var) else "✗ not set"
             typer.echo(f"  {name:<12} {env_var:<22} {is_set}")
     typer.echo(
-        "\nTip: use 'local' provider with --base-url for Ollama/vLLM, e.g.:\n"
+        "\nTip: use 'local' provider with --base-url for Ollama or vLLM:\n"
+        "  # Ollama (default port)\n"
         "  aevyra-verdict run data.jsonl -m local/llama3.2:1b --base-url http://localhost:11434/v1\n"
+        "\n"
+        "  # vLLM\n"
+        "  aevyra-verdict run data.jsonl -m local/meta-llama/Llama-3.2-1B --base-url http://localhost:8000/v1\n"
     )
 
 
