@@ -105,6 +105,8 @@ jobs:
         run: pip install vllm --extra-index-url https://download.pytorch.org/whl/cpu
 
       - name: Start vLLM server
+        env:
+          CUDA_VISIBLE_DEVICES: ""
         run: |
           python -m vllm.entrypoints.openai.api_server \
             --model facebook/opt-125m \

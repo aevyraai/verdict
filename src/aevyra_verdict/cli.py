@@ -270,7 +270,7 @@ def run(
     from aevyra_verdict.metrics import RougeScore, BleuScore, ExactMatch, LLMJudge, CustomMetric
     from aevyra_verdict.providers import get_provider
 
-    # --- Validate inputs ---
+    # --- Validate all inputs upfront before any provider instantiation ---
     if not dataset.exists():
         typer.echo(f"[error] Dataset not found: {dataset}", err=True)
         raise typer.Exit(code=1)
@@ -288,6 +288,23 @@ def run(
             err=True,
         )
         raise typer.Exit(code=1)
+
+    if judge_prompt and not judge_prompt.exists():
+        typer.echo(f"[error] Judge prompt file not found: {judge_prompt}", err=True)
+        raise typer.Exit(code=1)
+
+    for cm_spec in custom_metric:
+        if ":" not in cm_spec:
+            typer.echo(
+                f"[error] --custom-metric must be in 'file.py:function_name' format.\n"
+                f"  Example: --custom-metric my_metrics.py:brevity_score",
+                err=True,
+            )
+            raise typer.Exit(code=1)
+        file_part = cm_spec.rpartition(":")[0]
+        if not Path(file_part).exists():
+            typer.echo(f"[error] Custom metric file not found: {file_part}", err=True)
+            raise typer.Exit(code=1)
 
     # --- Resolve model list ---
     model_defs: list[dict[str, Any]] = []
@@ -352,9 +369,6 @@ def run(
 
         prompt_template = None
         if judge_prompt:
-            if not judge_prompt.exists():
-                typer.echo(f"[error] Judge prompt file not found: {judge_prompt}", err=True)
-                raise typer.Exit(code=1)
             prompt_template = judge_prompt.read_text()
             typer.echo(f"Using custom judge prompt from: {judge_prompt}")
 
