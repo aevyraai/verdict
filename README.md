@@ -7,7 +7,7 @@ dataset of prompts (OpenAI, ShareGPT, or Alpaca format), it runs completions aga
 combination of models, scores the responses with pluggable metrics, and gives you
 structured results for comparison.
 
-## Why
+## Use cases
 
 **Finding the best model for your use case.** Instead of manually testing models one by
 one, run your actual prompts across all of them at once and get an objective, scored
