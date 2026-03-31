@@ -90,27 +90,12 @@ without burning retry budget. Results land in `EvalResults`.
 
 ```mermaid
 flowchart LR
-    DS[(Dataset\nJSONL / ShareGPT / Alpaca)]:::data
+    DS[Dataset]:::data
+    R[EvalRunner]:::model
+    M[Metrics]:::metric
+    OUT[Results]:::output
 
-    subgraph runner["⚡ EvalRunner (concurrent)"]
-        direction TB
-        MA["Model A"]:::model
-        MB["Model B"]:::model
-        MC["Model C"]:::model
-    end
-
-    subgraph metrics["📊 Metrics"]
-        direction TB
-        R["ROUGE / BLEU"]:::metric
-        J["LLM Judge"]:::metric
-        C["Custom Python fn"]:::metric
-    end
-
-    OUT["Results\ncomparison table · JSON export"]:::output
-
-    DS --> runner
-    runner --> metrics
-    metrics --> OUT
+    DS --> R --> M --> OUT
 
     classDef data    fill:#6E3FF3,color:#fff,stroke:none
     classDef model   fill:#9B6BFF,color:#fff,stroke:none

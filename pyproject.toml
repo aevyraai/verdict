@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "aevyra-verdict"
 version = "0.1.0"
-description = "A framework for evaluating and comparing LLM outputs across models and providers"
+description = "Benchmark any LLM against your data. Pick the best model, then make it better."
 readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.10"
