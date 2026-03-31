@@ -2,20 +2,24 @@
 
 [![CI](https://github.com/aevyraai/verdict/actions/workflows/ci.yml/badge.svg)](https://github.com/aevyraai/verdict/actions/workflows/ci.yml)
 
-A Python framework for evaluating and comparing LLM outputs across models and providers. Given a
-dataset of prompts (OpenAI, ShareGPT, or Alpaca format), it runs completions against any
-combination of models, scores the responses with pluggable metrics, and gives you
-structured results for comparison.
+Benchmark any LLM against your data. Pick the best model, then make it better.
+
+verdict runs your prompts across any combination of models, scores the responses with
+pluggable metrics, and gives you a side-by-side comparison — so you can choose the right
+model for your task, then track whether your prompt engineering or fine-tuning is actually
+moving the needle.
 
 ## Use cases
 
-**Finding the best model for your use case.** Instead of manually testing models one by
-one, run your actual prompts across all of them at once and get an objective, scored
-comparison.
+**Choosing the right model.** Instead of guessing, run your actual prompts across GPT-4o,
+Claude, Gemini, Llama — and pick the one that scores highest on your specific task.
 
-**Benchmarking an open-source model against closed ones.** If you have a target OSS
-model in mind, measure how it performs against SOTA closed models on your specific
-workload — and identify exactly where the gap is so you know what to improve.
+**Measuring improvement.** Establish a baseline score, tweak your system prompt or
+fine-tune your model, re-run verdict. If the number goes up, your change helped. If it
+doesn't, you know to try something else.
+
+**Benchmarking open-source vs closed models.** Measure how a local model stacks up
+against SOTA closed models on your workload — and identify exactly where the gap is.
 
 ## Install
 
