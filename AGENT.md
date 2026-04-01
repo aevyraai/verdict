@@ -111,7 +111,7 @@ runner.add_provider("openai", "gpt-5.4-nano")
 runner.add_provider("anthropic", "claude-haiku-4-5")
 
 # With custom label
-runner.add_provider("openai", "gpt-5.4-mini", label="gpt-5.4-mini")
+runner.add_provider("openai", "gpt-5.4-nano", label="gpt-5.4-nano")
 
 # Local Ollama
 runner.add_provider("local", "llama3.2:1b", base_url="http://localhost:11434/v1")
@@ -153,7 +153,7 @@ runner.add_metric(BleuScore())    # requires ideal answers
 runner.add_metric(ExactMatch())   # requires ideal answers
 
 # LLM-as-judge (no ideal answer required)
-judge = get_provider("openai", "gpt-5.4-nano")
+judge = get_provider("openai", "gpt-5.4")
 runner.add_metric(LLMJudge(judge_provider=judge))
 
 # Custom judge prompt

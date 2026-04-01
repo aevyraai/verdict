@@ -168,7 +168,7 @@ jobs:
         run: pytest tests/test_openrouter.py -v
 
   # ---------------------------------------------------------------------------
-  # OpenAI integration — uses gpt-5.4-nano, needs secret + funded account
+  # OpenAI integration — uses gpt-5.4-nano (eval) and gpt-5.4 (judge), needs secret + funded account
   # ---------------------------------------------------------------------------
   openai:
     name: OpenAI integration

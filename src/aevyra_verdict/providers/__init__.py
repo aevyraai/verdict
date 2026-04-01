@@ -75,7 +75,7 @@ def get_provider(name: str, model: str, **kwargs: Any) -> Provider:
         A configured Provider instance ready to call .complete().
 
     Example:
-        provider = get_provider("anthropic", "claude-sonnet-4-6")
+        provider = get_provider("openai", "gpt-5.4-nano")
         result = provider.complete([{"role": "user", "content": "Hello"}])
     """
     if not _PROVIDER_REGISTRY:

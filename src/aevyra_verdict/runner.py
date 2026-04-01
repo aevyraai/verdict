@@ -104,8 +104,8 @@ class EvalRunner:
 
     Basic usage:
         runner = EvalRunner()
-        runner.add_provider("openai", "gpt-5.4-mini")
-        runner.add_provider("anthropic", "claude-sonnet-4-6")
+        runner.add_provider("openai", "gpt-5.4-nano")
+        runner.add_provider("qwen", "qwen3.5-9b")
         runner.add_metric(ExactMatch())
         results = runner.run(dataset)
     """

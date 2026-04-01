@@ -56,7 +56,7 @@ runner = EvalRunner()
 runner.add_provider("openai", "gpt-5.4-nano")
 runner.add_provider("openrouter", "qwen/qwen3.5-9b")
 runner.add_metric(RougeScore())
-runner.add_metric(LLMJudge(judge_provider=get_provider("openai", "gpt-5.4-nano")))
+runner.add_metric(LLMJudge(judge_provider=get_provider("openai", "gpt-5.4")))
 
 results = runner.run(dataset)
 print(results.compare())

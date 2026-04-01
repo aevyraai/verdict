@@ -233,7 +233,7 @@ class TestRunFlags:
         result = runner.invoke(app, [
             "run", str(path),
             "-m", "openai/gpt-5.4-nano",
-            "-m", "openai/gpt-5.4-mini",
+            "-m", "openai/gpt-5.4-nano",
         ])
         assert "no such option" not in result.output.lower()
 
