@@ -111,7 +111,7 @@ def _parse_model_flag(spec: str) -> dict[str, str]:
     if "/" not in spec:
         typer.echo(
             f"[error] Model spec {spec!r} must be in 'provider/model' format.\n"
-            f"  Examples: openai/gpt-5.4-mini   anthropic/claude-sonnet-4-6   google/gemini-2.0-flash",
+            f"  Examples: openai/gpt-5.4-nano   qwen/qwen3.5-9b   google/gemini-2.0-flash",
             err=True,
         )
         raise typer.Exit(code=1)
@@ -262,7 +262,7 @@ def run(
     \b
     Examples:
       # Inline models
-      aevyra-verdict run data.jsonl -m openai/gpt-5.4-mini -m anthropic/claude-sonnet-4-6
+      aevyra-verdict run data.jsonl -m openai/gpt-5.4-nano -m qwen/qwen3.5-9b
 
       # Local Ollama instance
       aevyra-verdict run data.jsonl -m local/llama3.2:1b --base-url http://localhost:11434/v1

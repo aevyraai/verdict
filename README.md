@@ -39,8 +39,8 @@ aevyra-verdict providers
 
 # 2. Compare models on a dataset and save results
 aevyra-verdict run dataset.jsonl \
-  -m openai/gpt-5.4-mini \
-  -m anthropic/claude-sonnet-4-6 \
+  -m openai/gpt-5.4-nano \
+  -m qwen/qwen3.5-9b \
   -o results.json
 ```
 
@@ -266,8 +266,8 @@ Pass `--model` (or `-m`) once per model, in `provider/model` format:
 
 ```bash
 aevyra-verdict run dataset.jsonl \
-  -m openai/gpt-5.4-mini \
-  -m anthropic/claude-sonnet-4-6 \
+  -m openai/gpt-5.4-nano \
+  -m qwen/qwen3.5-9b \
   -m google/gemini-2.0-flash
 ```
 
