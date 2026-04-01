@@ -111,7 +111,7 @@ def _parse_model_flag(spec: str) -> dict[str, str]:
     if "/" not in spec:
         typer.echo(
             f"[error] Model spec {spec!r} must be in 'provider/model' format.\n"
-            f"  Examples: openai/gpt-5.4-mini   anthropic/claude-sonnet-4-6   google/gemini-2.0-flash",
+            f"  Examples: openai/gpt-5.4-nano   anthropic/claude-sonnet-4-6   google/gemini-2.0-flash",
             err=True,
         )
         raise typer.Exit(code=1)
@@ -262,7 +262,7 @@ def run(
     \b
     Examples:
       # Inline models
-      aevyra-verdict run data.jsonl -m openai/gpt-5.4-mini -m anthropic/claude-sonnet-4-6
+      aevyra-verdict run data.jsonl -m openai/gpt-5.4-nano -m qwen/qwen3.5-9b
 
       # Local Ollama instance
       aevyra-verdict run data.jsonl -m local/llama3.2:1b --base-url http://localhost:11434/v1
@@ -271,10 +271,10 @@ def run(
       aevyra-verdict run data.jsonl --config models.yaml
 
       # Custom judge prompt
-      aevyra-verdict run data.jsonl -m openai/gpt-5.4-mini --judge openai/gpt-5.4 --judge-prompt prompt.txt
+      aevyra-verdict run data.jsonl -m openai/gpt-5.4-nano --judge openai/gpt-5.4 --judge-prompt prompt.txt
 
       # Custom scoring function
-      aevyra-verdict run data.jsonl -m openai/gpt-5.4-mini --custom-metric my_metrics.py:brevity_score
+      aevyra-verdict run data.jsonl -m openai/gpt-5.4-nano --custom-metric my_metrics.py:brevity_score
 
       # Save results
       aevyra-verdict run data.jsonl --config models.yaml --metric rouge --judge openai/gpt-5.4 -o results.json
@@ -297,7 +297,7 @@ def run(
         typer.echo(
             "[error] Specify models via --model or --config.\n"
             "  Examples:\n"
-            "    --model openai/gpt-5.4-mini\n"
+            "    --model openai/gpt-5.4-nano\n"
             "    --config models.yaml",
             err=True,
         )

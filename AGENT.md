@@ -111,7 +111,7 @@ runner.add_provider("openai", "gpt-5.4-nano")
 runner.add_provider("anthropic", "claude-haiku-4-5")
 
 # With custom label
-runner.add_provider("openai", "gpt-5.4-mini", label="gpt-5.4-mini")
+runner.add_provider("openai", "gpt-5.4-nano", label="gpt-5.4-nano")
 
 # Local Ollama
 runner.add_provider("local", "llama3.2:1b", base_url="http://localhost:11434/v1")

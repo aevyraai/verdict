@@ -5,16 +5,12 @@
 
 models:
   - provider: openai
-    model: gpt-5.4-mini
-    label: gpt-5.4-mini          # optional display name in results
+    model: gpt-5.4-nano
+    label: gpt-5.4-nano          # optional display name in results
 
-  - provider: anthropic
-    model: claude-sonnet-4-6
-    label: claude-sonnet
-
-  - provider: google
-    model: gemini-2.0-flash
-    label: gemini-flash
+  - provider: openrouter
+    model: qwen/qwen3.5-9b
+    label: qwen3.5-9b              # access via openrouter.ai
 
   # OpenRouter — access 200+ models with a single API key (openrouter.ai)
   # Requires OPENROUTER_API_KEY. Model names follow 'provider/model' format.

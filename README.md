@@ -39,7 +39,7 @@ aevyra-verdict providers
 
 # 2. Compare models on a dataset and save results
 aevyra-verdict run dataset.jsonl \
-  -m openai/gpt-5.4-mini \
+  -m openai/gpt-5.4-nano \
   -m anthropic/claude-sonnet-4-6 \
   -o results.json
 ```
@@ -53,8 +53,8 @@ from aevyra_verdict.providers import get_provider
 dataset = Dataset.from_jsonl("examples/sample_data.jsonl")
 
 runner = EvalRunner()
-runner.add_provider("openai", "gpt-5.4-mini")
-runner.add_provider("anthropic", "claude-sonnet-4-6")
+runner.add_provider("openai", "gpt-5.4-nano")
+runner.add_provider("qwen", "qwen3.5-9b")
 runner.add_metric(RougeScore())
 runner.add_metric(LLMJudge(judge_provider=get_provider("openai", "gpt-5.4")))
 
@@ -178,7 +178,7 @@ print(list_providers())
 # ['anthropic', 'cohere', 'google', 'mistral', 'openai']
 
 # Each provider takes a model name and optional api_key / base_url
-provider = get_provider("openai", "gpt-5.4-mini", api_key="sk-...")
+provider = get_provider("openai", "gpt-5.4-nano", api_key="sk-...")
 result = provider.complete([{"role": "user", "content": "Hello"}])
 print(result.text, result.latency_ms, result.usage)
 ```
@@ -219,7 +219,7 @@ RougeScore(variant="rougeL")        # also "rouge1", "rouge2"
 from aevyra_verdict import LLMJudge
 from aevyra_verdict.providers import get_provider
 
-judge = get_provider("anthropic", "claude-sonnet-4-6")
+judge = get_provider("openai", "gpt-5.4")
 LLMJudge(judge_provider=judge)
 LLMJudge(judge_provider=judge, criteria="Focus only on factual accuracy.")
 ```
@@ -266,7 +266,7 @@ Pass `--model` (or `-m`) once per model, in `provider/model` format:
 
 ```bash
 aevyra-verdict run dataset.jsonl \
-  -m openai/gpt-5.4-mini \
+  -m openai/gpt-5.4-nano \
   -m anthropic/claude-sonnet-4-6 \
   -m google/gemini-2.0-flash
 ```
@@ -305,19 +305,19 @@ Start a local vLLM server with: `vllm serve meta-llama/Llama-3.1-8B-Instruct`
 Use `--metric` for built-in options (`rouge`, `bleu`, `exact`) and repeat for multiple:
 
 ```bash
-aevyra-verdict run dataset.jsonl -m openai/gpt-5.4-mini --metric rouge --metric bleu
+aevyra-verdict run dataset.jsonl -m openai/gpt-5.4-nano --metric rouge --metric bleu
 ```
 
 Add an LLM-as-judge with `--judge`:
 
 ```bash
-aevyra-verdict run dataset.jsonl -m openai/gpt-5.4-mini --judge openai/gpt-5.4
+aevyra-verdict run dataset.jsonl -m openai/gpt-5.4-nano --judge openai/gpt-5.4
 ```
 
 To customise the judge's evaluation criteria, pass a prompt template file. The recommended format is `.md` since judge prompts tend to have structure. Use `{criteria}`, `{conversation}`, `{response}`, and `{ideal_section}` as placeholders:
 
 ```bash
-aevyra-verdict run dataset.jsonl -m openai/gpt-5.4-mini \
+aevyra-verdict run dataset.jsonl -m openai/gpt-5.4-nano \
   --judge openai/gpt-5.4 \
   --judge-prompt examples/judge_prompt.md
 ```
@@ -327,7 +327,7 @@ aevyra-verdict run dataset.jsonl -m openai/gpt-5.4-mini \
 To use a custom Python scoring function, point at a file and name the function:
 
 ```bash
-aevyra-verdict run dataset.jsonl -m openai/gpt-5.4-mini \
+aevyra-verdict run dataset.jsonl -m openai/gpt-5.4-nano \
   --custom-metric examples/custom_metrics.py:brevity_score \
   --custom-metric examples/custom_metrics.py:contains_code
 ```

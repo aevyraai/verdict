@@ -31,7 +31,7 @@ class OpenRouterProvider(Provider):
     OpenAI, Anthropic, Google, Meta, Mistral, and others. Use model names in
     'provider/model' format as listed on openrouter.ai/models, e.g.:
         - anthropic/claude-sonnet-4-6
-        - openai/gpt-5.4-mini
+        - openai/gpt-5.4-nano
         - meta-llama/llama-3.1-8b-instruct
         - google/gemini-2.0-flash
 
@@ -50,7 +50,7 @@ class OpenRouterProvider(Provider):
         **kwargs: Any,
     ):
         """Args:
-            model: Model identifier in 'provider/model' format (e.g. 'openai/gpt-5.4-mini').
+            model: Model identifier in 'provider/model' format (e.g. 'openai/gpt-5.4-nano').
             api_key: OpenRouter API key. Defaults to OPENROUTER_API_KEY env var.
             base_url: Override the OpenRouter base URL. Rarely needed.
             site_url: Your site URL, sent as HTTP-Referer. Recommended by OpenRouter
