@@ -1,6 +1,7 @@
 # aevyra-verdict
 
 [![CI](https://github.com/aevyraai/verdict/actions/workflows/ci.yml/badge.svg)](https://github.com/aevyraai/verdict/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/aevyra-verdict.svg)](https://pypi.org/project/aevyra-verdict/)
 
 Benchmark any LLM against your data. Pick the best model, then make it better.
 
@@ -11,8 +12,8 @@ moving the needle.
 
 ## Use cases
 
-**Choosing the right model.** Instead of guessing, run your actual prompts across GPT-4o,
-Claude, Gemini, Llama — and pick the one that scores highest on your specific task.
+**Choosing the right model.** Instead of guessing, run your actual prompts across GPT-5.4-mini,
+Claude Sonnet, Gemini, Llama — and pick the one that scores highest on your specific task.
 
 **Measuring improvement.** Establish a baseline score, tweak your system prompt or
 fine-tune your model, re-run verdict. If the number goes up, your change helped. If it
@@ -24,7 +25,7 @@ against SOTA closed models on your workload — and identify exactly where the g
 ## Install
 
 ```bash
-pip install -e .
+pip install aevyra-verdict
 ```
 
 This pulls in the SDKs for OpenAI, Anthropic, Google (Gemini), Mistral, and Cohere.
@@ -38,8 +39,8 @@ aevyra-verdict providers
 
 # 2. Compare models on a dataset and save results
 aevyra-verdict run dataset.jsonl \
-  -m openai/gpt-4o \
-  -m anthropic/claude-sonnet-4-20250514 \
+  -m openai/gpt-5.4-mini \
+  -m anthropic/claude-sonnet-4-6 \
   -o results.json
 ```
 
@@ -52,10 +53,10 @@ from aevyra_verdict.providers import get_provider
 dataset = Dataset.from_jsonl("examples/sample_data.jsonl")
 
 runner = EvalRunner()
-runner.add_provider("openai", "gpt-4o")
-runner.add_provider("anthropic", "claude-sonnet-4-20250514")
+runner.add_provider("openai", "gpt-5.4-mini")
+runner.add_provider("anthropic", "claude-sonnet-4-6")
 runner.add_metric(RougeScore())
-runner.add_metric(LLMJudge(judge_provider=get_provider("openai", "gpt-4o-mini")))
+runner.add_metric(LLMJudge(judge_provider=get_provider("openai", "gpt-5.4-nano")))
 
 results = runner.run(dataset)
 print(results.compare())
@@ -177,7 +178,7 @@ print(list_providers())
 # ['anthropic', 'cohere', 'google', 'mistral', 'openai']
 
 # Each provider takes a model name and optional api_key / base_url
-provider = get_provider("openai", "gpt-4o", api_key="sk-...")
+provider = get_provider("openai", "gpt-5.4-mini", api_key="sk-...")
 result = provider.complete([{"role": "user", "content": "Hello"}])
 print(result.text, result.latency_ms, result.usage)
 ```
@@ -218,7 +219,7 @@ RougeScore(variant="rougeL")        # also "rouge1", "rouge2"
 from aevyra_verdict import LLMJudge
 from aevyra_verdict.providers import get_provider
 
-judge = get_provider("anthropic", "claude-sonnet-4-20250514")
+judge = get_provider("anthropic", "claude-sonnet-4-6")
 LLMJudge(judge_provider=judge)
 LLMJudge(judge_provider=judge, criteria="Focus only on factual accuracy.")
 ```
@@ -265,8 +266,8 @@ Pass `--model` (or `-m`) once per model, in `provider/model` format:
 
 ```bash
 aevyra-verdict run dataset.jsonl \
-  -m openai/gpt-4o \
-  -m anthropic/claude-sonnet-4-20250514 \
+  -m openai/gpt-5.4-mini \
+  -m anthropic/claude-sonnet-4-6 \
   -m google/gemini-2.0-flash
 ```
 
@@ -282,11 +283,11 @@ The config file supports JSON, YAML, and TOML. Each model entry takes `provider`
 # models.yaml
 models:
   - provider: openai
-    model: gpt-4o
-    label: gpt-4o
+    model: gpt-5.4-mini
+    label: gpt-5.4-mini
 
   - provider: anthropic
-    model: claude-sonnet-4-20250514
+    model: claude-sonnet-4-6
     label: claude-sonnet
 
   # Local vLLM instance — uses the OpenAI-compatible API
@@ -304,20 +305,20 @@ Start a local vLLM server with: `vllm serve meta-llama/Llama-3.1-8B-Instruct`
 Use `--metric` for built-in options (`rouge`, `bleu`, `exact`) and repeat for multiple:
 
 ```bash
-aevyra-verdict run dataset.jsonl -m openai/gpt-4o --metric rouge --metric bleu
+aevyra-verdict run dataset.jsonl -m openai/gpt-5.4-mini --metric rouge --metric bleu
 ```
 
 Add an LLM-as-judge with `--judge`:
 
 ```bash
-aevyra-verdict run dataset.jsonl -m openai/gpt-4o --judge openai/gpt-4o-mini
+aevyra-verdict run dataset.jsonl -m openai/gpt-5.4-mini --judge openai/gpt-5.4-nano
 ```
 
 To customise the judge's evaluation criteria, pass a prompt template file. The recommended format is `.md` since judge prompts tend to have structure. Use `{criteria}`, `{conversation}`, `{response}`, and `{ideal_section}` as placeholders:
 
 ```bash
-aevyra-verdict run dataset.jsonl -m openai/gpt-4o \
-  --judge openai/gpt-4o-mini \
+aevyra-verdict run dataset.jsonl -m openai/gpt-5.4-mini \
+  --judge openai/gpt-5.4-nano \
   --judge-prompt examples/judge_prompt.md
 ```
 
@@ -326,7 +327,7 @@ aevyra-verdict run dataset.jsonl -m openai/gpt-4o \
 To use a custom Python scoring function, point at a file and name the function:
 
 ```bash
-aevyra-verdict run dataset.jsonl -m openai/gpt-4o \
+aevyra-verdict run dataset.jsonl -m openai/gpt-5.4-mini \
   --custom-metric examples/custom_metrics.py:brevity_score \
   --custom-metric examples/custom_metrics.py:contains_code
 ```
@@ -386,8 +387,15 @@ is lowering `max_workers`.
 
 ## Contributing
 
-This project is in early development. Bug reports and PRs for new providers or
-metrics are welcome — open an issue first for anything larger than a bug fix.
+Bug reports and PRs are welcome. Open an issue first for anything larger than a bug fix.
+
+**Adding a provider** — subclass `Provider` in `src/aevyra_verdict/providers/`, implement
+`complete()`, and register it with `register_provider()`. See `openai_provider.py` as the
+reference implementation.
+
+**Adding a metric** — subclass `Metric` in `src/aevyra_verdict/metrics/`, implement
+`score()`, and add it to the exports in `metrics/__init__.py`. See `reference.py` for
+reference-based metrics and `judge.py` for LLM-as-judge.
 
 ## License
 
