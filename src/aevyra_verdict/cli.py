@@ -214,7 +214,7 @@ def run(
         Optional[str],
         typer.Option(
             "--judge",
-            help="Use LLM-as-judge with this model spec (e.g. openai/gpt-5.4-nano).",
+            help="Use LLM-as-judge with this model spec (e.g. openai/gpt-5.4).",
         ),
     ] = None,
     judge_prompt: Annotated[
@@ -271,13 +271,13 @@ def run(
       aevyra-verdict run data.jsonl --config models.yaml
 
       # Custom judge prompt
-      aevyra-verdict run data.jsonl -m openai/gpt-5.4-mini --judge openai/gpt-5.4-nano --judge-prompt prompt.txt
+      aevyra-verdict run data.jsonl -m openai/gpt-5.4-mini --judge openai/gpt-5.4 --judge-prompt prompt.txt
 
       # Custom scoring function
       aevyra-verdict run data.jsonl -m openai/gpt-5.4-mini --custom-metric my_metrics.py:brevity_score
 
       # Save results
-      aevyra-verdict run data.jsonl --config models.yaml --metric rouge --judge openai/gpt-5.4-nano -o results.json
+      aevyra-verdict run data.jsonl --config models.yaml --metric rouge --judge openai/gpt-5.4 -o results.json
     """
     from aevyra_verdict.dataset import Dataset
     from aevyra_verdict.runner import EvalRunner, RunConfig

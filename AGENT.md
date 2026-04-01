@@ -153,7 +153,7 @@ runner.add_metric(BleuScore())    # requires ideal answers
 runner.add_metric(ExactMatch())   # requires ideal answers
 
 # LLM-as-judge (no ideal answer required)
-judge = get_provider("openai", "gpt-5.4-nano")
+judge = get_provider("openai", "gpt-5.4")
 runner.add_metric(LLMJudge(judge_provider=judge))
 
 # Custom judge prompt

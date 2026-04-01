@@ -56,7 +56,7 @@ runner = EvalRunner()
 runner.add_provider("openai", "gpt-5.4-mini")
 runner.add_provider("anthropic", "claude-sonnet-4-6")
 runner.add_metric(RougeScore())
-runner.add_metric(LLMJudge(judge_provider=get_provider("openai", "gpt-5.4-nano")))
+runner.add_metric(LLMJudge(judge_provider=get_provider("openai", "gpt-5.4")))
 
 results = runner.run(dataset)
 print(results.compare())
@@ -311,14 +311,14 @@ aevyra-verdict run dataset.jsonl -m openai/gpt-5.4-mini --metric rouge --metric 
 Add an LLM-as-judge with `--judge`:
 
 ```bash
-aevyra-verdict run dataset.jsonl -m openai/gpt-5.4-mini --judge openai/gpt-5.4-nano
+aevyra-verdict run dataset.jsonl -m openai/gpt-5.4-mini --judge openai/gpt-5.4
 ```
 
 To customise the judge's evaluation criteria, pass a prompt template file. The recommended format is `.md` since judge prompts tend to have structure. Use `{criteria}`, `{conversation}`, `{response}`, and `{ideal_section}` as placeholders:
 
 ```bash
 aevyra-verdict run dataset.jsonl -m openai/gpt-5.4-mini \
-  --judge openai/gpt-5.4-nano \
+  --judge openai/gpt-5.4 \
   --judge-prompt examples/judge_prompt.md
 ```
 
