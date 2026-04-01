@@ -25,8 +25,8 @@ runner = EvalRunner(config=RunConfig(max_workers=5))
 Add a model to evaluate. Returns `self` for chaining.
 
 ```python
-runner.add_provider("openai", "gpt-5.4-mini")
-runner.add_provider("anthropic", "claude-sonnet-4-6", label="claude")
+runner.add_provider("openai", "gpt-5.4-nano")
+runner.add_provider("openrouter", "qwen/qwen3.5-9b", label="qwen3.5-9b")
 runner.add_provider("openai", "llama", base_url="http://localhost:8000/v1", api_key="none")
 ```
 
