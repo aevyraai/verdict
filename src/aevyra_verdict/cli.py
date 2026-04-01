@@ -111,7 +111,7 @@ def _parse_model_flag(spec: str) -> dict[str, str]:
     if "/" not in spec:
         typer.echo(
             f"[error] Model spec {spec!r} must be in 'provider/model' format.\n"
-            f"  Examples: openai/gpt-5.4-nano   anthropic/claude-sonnet-4-6   google/gemini-2.0-flash",
+            f"  Examples: openai/gpt-5.4-nano   qwen/qwen3.5-9b   google/gemini-2.0-flash",
             err=True,
         )
         raise typer.Exit(code=1)

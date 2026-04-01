@@ -42,7 +42,7 @@ Eval: dataset | Metric: rouge_rougeL
 Model                               Mean     Stdev    Latency   Errors
 ------------------------------------------------------------------------
 openai/gpt-5.4-nano                     0.7823      N/A    312.4ms        0
-anthropic/claude-sonnet-4-...     0.7541      N/A    289.1ms        0
+qwen/qwen3.5-9b                   0.7541      N/A    289.1ms        0
 ------------------------------------------------------------------------
 ```
 
@@ -59,6 +59,6 @@ aevyra-verdict run dataset.jsonl -m openai/gpt-5.4-nano -o results.json
     Use a config file to manage multiple models including local vLLM instances
   </Card>
   <Card title="Add an LLM judge" icon="gavel" href="/docs/metrics">
-    Score responses with Claude or GPT instead of reference-based metrics
+    Score responses with an LLM judge instead of reference-based metrics
   </Card>
 </CardGroup>

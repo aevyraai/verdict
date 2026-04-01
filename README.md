@@ -40,7 +40,7 @@ aevyra-verdict providers
 # 2. Compare models on a dataset and save results
 aevyra-verdict run dataset.jsonl \
   -m openai/gpt-5.4-nano \
-  -m anthropic/claude-sonnet-4-6 \
+  -m qwen/qwen3.5-9b \
   -o results.json
 ```
 
@@ -54,7 +54,7 @@ dataset = Dataset.from_jsonl("examples/sample_data.jsonl")
 
 runner = EvalRunner()
 runner.add_provider("openai", "gpt-5.4-nano")
-runner.add_provider("qwen", "qwen3.5-9b")
+runner.add_provider("openrouter", "qwen/qwen3.5-9b")
 runner.add_metric(RougeScore())
 runner.add_metric(LLMJudge(judge_provider=get_provider("openai", "gpt-5.4")))
 
@@ -267,7 +267,7 @@ Pass `--model` (or `-m`) once per model, in `provider/model` format:
 ```bash
 aevyra-verdict run dataset.jsonl \
   -m openai/gpt-5.4-nano \
-  -m anthropic/claude-sonnet-4-6 \
+  -m qwen/qwen3.5-9b \
   -m google/gemini-2.0-flash
 ```
 
@@ -283,12 +283,12 @@ The config file supports JSON, YAML, and TOML. Each model entry takes `provider`
 # models.yaml
 models:
   - provider: openai
-    model: gpt-5.4-mini
-    label: gpt-5.4-mini
+    model: gpt-5.4-nano
+    label: gpt-5.4-nano
 
-  - provider: anthropic
-    model: claude-sonnet-4-6
-    label: claude-sonnet
+  - provider: openrouter
+    model: qwen/qwen3.5-9b
+    label: qwen3.5-9b
 
   # Local vLLM instance — uses the OpenAI-compatible API
   - provider: openai
