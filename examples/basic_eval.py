@@ -24,15 +24,15 @@ print(f"Dataset summary: {dataset.summary()}\n")
 
 # Set up the runner with models to compare
 runner = EvalRunner()
-runner.add_provider("openai", "gpt-4o")
-runner.add_provider("anthropic", "claude-sonnet-4-20250514")
+runner.add_provider("openai", "gpt-5.4-mini")
+runner.add_provider("anthropic", "claude-sonnet-4-6")
 
 # Add metrics
 runner.add_metric(RougeScore(variant="rougeL"))
 runner.add_metric(ExactMatch())
 
 # Optionally add LLM-as-judge (uses a separate model to evaluate)
-judge_provider = get_provider("openai", "gpt-4o-mini")
+judge_provider = get_provider("openai", "gpt-5.4-nano")
 runner.add_metric(LLMJudge(judge_provider=judge_provider))
 
 # Run the eval

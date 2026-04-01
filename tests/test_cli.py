@@ -106,10 +106,10 @@ class TestRunCommandValidation:
     def test_model_and_config_mutually_exclusive(self, tmp_path):
         path = make_dataset(tmp_path)
         config = tmp_path / "models.yaml"
-        config.write_text("models:\n  - provider: openai\n    model: gpt-4o-mini\n")
+        config.write_text("models:\n  - provider: openai\n    model: gpt-5.4-nano\n")
         result = runner.invoke(app, [
             "run", str(path),
-            "-m", "openai/gpt-4o-mini",
+            "-m", "openai/gpt-5.4-nano",
             "-c", str(config),
         ])
         assert result.exit_code != 0
@@ -118,7 +118,7 @@ class TestRunCommandValidation:
     def test_missing_dataset_file(self, tmp_path):
         result = runner.invoke(app, [
             "run", str(tmp_path / "missing.jsonl"),
-            "-m", "openai/gpt-4o-mini",
+            "-m", "openai/gpt-5.4-nano",
         ])
         assert result.exit_code != 0
         assert "not found" in result.output.lower() or "error" in result.output.lower()
@@ -134,7 +134,7 @@ class TestRunCommandValidation:
         # This will fail at API call stage, but we just check the warning is emitted
         result = runner.invoke(app, [
             "run", str(path),
-            "-m", "openai/gpt-4o-mini",
+            "-m", "openai/gpt-5.4-nano",
             "--metric", "nonexistent",
         ])
         assert "unknown" in result.output.lower() or "warning" in result.output.lower() \
@@ -144,7 +144,7 @@ class TestRunCommandValidation:
         path = make_dataset(tmp_path)
         result = runner.invoke(app, [
             "run", str(path),
-            "-m", "openai/gpt-4o-mini",
+            "-m", "openai/gpt-5.4-nano",
             "--custom-metric", "no-colon",
         ])
         assert result.exit_code != 0
@@ -154,7 +154,7 @@ class TestRunCommandValidation:
         path = make_dataset(tmp_path)
         result = runner.invoke(app, [
             "run", str(path),
-            "-m", "openai/gpt-4o-mini",
+            "-m", "openai/gpt-5.4-nano",
             "--custom-metric", "missing.py:my_func",
         ])
         assert result.exit_code != 0
@@ -164,8 +164,8 @@ class TestRunCommandValidation:
         path = make_dataset(tmp_path)
         result = runner.invoke(app, [
             "run", str(path),
-            "-m", "openai/gpt-4o-mini",
-            "--judge", "openai/gpt-4o-mini",
+            "-m", "openai/gpt-5.4-nano",
+            "--judge", "openai/gpt-5.4-nano",
             "--judge-prompt", str(tmp_path / "missing_prompt.md"),
         ])
         assert result.exit_code != 0
@@ -197,7 +197,7 @@ class TestConfigFileParsing:
     def test_yaml_config_missing_provider(self, tmp_path):
         path = make_dataset(tmp_path)
         config = tmp_path / "bad.yaml"
-        config.write_text("models:\n  - model: gpt-4o-mini\n")
+        config.write_text("models:\n  - model: gpt-5.4-nano\n")
         result = runner.invoke(app, ["run", str(path), "-c", str(config)])
         assert result.exit_code != 0
 
@@ -205,7 +205,7 @@ class TestConfigFileParsing:
         path = make_dataset(tmp_path)
         config = tmp_path / "models.json"
         config.write_text(json.dumps({
-            "models": [{"provider": "openai", "model": "gpt-4o-mini"}]
+            "models": [{"provider": "openai", "model": "gpt-5.4-nano"}]
         }))
         # Will fail at API call stage but config parsing should succeed
         result = runner.invoke(app, ["run", str(path), "-c", str(config)])
@@ -232,8 +232,8 @@ class TestRunFlags:
         path = make_dataset(tmp_path)
         result = runner.invoke(app, [
             "run", str(path),
-            "-m", "openai/gpt-4o-mini",
-            "-m", "openai/gpt-4o",
+            "-m", "openai/gpt-5.4-nano",
+            "-m", "openai/gpt-5.4-mini",
         ])
         assert "no such option" not in result.output.lower()
 
@@ -241,7 +241,7 @@ class TestRunFlags:
         path = make_dataset(tmp_path)
         result = runner.invoke(app, [
             "run", str(path),
-            "-m", "openai/gpt-4o-mini",
+            "-m", "openai/gpt-5.4-nano",
             "--temperature", "0.7",
         ])
         assert "no such option" not in result.output.lower()
@@ -250,7 +250,7 @@ class TestRunFlags:
         path = make_dataset(tmp_path)
         result = runner.invoke(app, [
             "run", str(path),
-            "-m", "openai/gpt-4o-mini",
+            "-m", "openai/gpt-5.4-nano",
             "--max-tokens", "512",
         ])
         assert "no such option" not in result.output.lower()
@@ -259,7 +259,7 @@ class TestRunFlags:
         path = make_dataset(tmp_path)
         result = runner.invoke(app, [
             "run", str(path),
-            "-m", "openai/gpt-4o-mini",
+            "-m", "openai/gpt-5.4-nano",
             "--max-workers", "4",
         ])
         assert "no such option" not in result.output.lower()
@@ -269,7 +269,7 @@ class TestRunFlags:
         out = tmp_path / "results.json"
         result = runner.invoke(app, [
             "run", str(path),
-            "-m", "openai/gpt-4o-mini",
+            "-m", "openai/gpt-5.4-nano",
             "-o", str(out),
         ])
         assert "no such option" not in result.output.lower()
@@ -278,7 +278,7 @@ class TestRunFlags:
         path = make_dataset(tmp_path)
         result = runner.invoke(app, [
             "run", str(path),
-            "-m", "openai/gpt-4o-mini",
+            "-m", "openai/gpt-5.4-nano",
             "--metric", "rouge",
             "--metric", "bleu",
         ])
@@ -290,8 +290,8 @@ class TestRunFlags:
         prompt.write_text("Rate this: {response}")
         result = runner.invoke(app, [
             "run", str(path),
-            "-m", "openai/gpt-4o-mini",
-            "--judge", "openai/gpt-4o-mini",
+            "-m", "openai/gpt-5.4-nano",
+            "--judge", "openai/gpt-5.4-nano",
             "--judge-prompt", str(prompt),
         ])
         assert "no such option" not in result.output.lower()
@@ -304,7 +304,7 @@ class TestRunFlags:
         )
         result = runner.invoke(app, [
             "run", str(path),
-            "-m", "openai/gpt-4o-mini",
+            "-m", "openai/gpt-5.4-nano",
             "--custom-metric", f"{metric_file}:my_score",
         ])
         assert "no such option" not in result.output.lower()

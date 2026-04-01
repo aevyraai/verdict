@@ -29,7 +29,7 @@ class OpenAIProvider(Provider):
 
     def __init__(
         self,
-        model: str = "gpt-4o",
+        model: str = "gpt-5.4-mini",
         api_key: str | None = None,
         base_url: str | None = None,
         **kwargs: Any,

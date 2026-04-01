@@ -61,7 +61,7 @@ Works with or without a reference answer.
 from aevyra_verdict import LLMJudge
 from aevyra_verdict.providers import get_provider
 
-judge = get_provider("openai", "gpt-4o-mini")
+judge = get_provider("openai", "gpt-5.4-nano")
 LLMJudge(judge_provider=judge)
 ```
 
@@ -83,8 +83,8 @@ For full control over the judge prompt, pass a `.md` file with these placeholder
 `{criteria}`, `{conversation}`, `{response}`, `{ideal_section}`.
 
 ```bash
-aevyra-verdict run data.jsonl -m openai/gpt-4o \
-  --judge openai/gpt-4o-mini \
+aevyra-verdict run data.jsonl -m openai/gpt-5.4-mini \
+  --judge openai/gpt-5.4-nano \
   --judge-prompt judge_prompt.md
 ```
 
@@ -94,11 +94,11 @@ aevyra-verdict run data.jsonl -m openai/gpt-4o \
 
 ```bash
 # Default judge prompt
-aevyra-verdict run data.jsonl -m openai/gpt-4o --judge openai/gpt-4o-mini
+aevyra-verdict run data.jsonl -m openai/gpt-5.4-mini --judge openai/gpt-5.4-nano
 
 # Custom judge prompt file
-aevyra-verdict run data.jsonl -m openai/gpt-4o \
-  --judge openai/gpt-4o-mini \
+aevyra-verdict run data.jsonl -m openai/gpt-5.4-mini \
+  --judge openai/gpt-5.4-nano \
   --judge-prompt my_prompt.md
 ```
 
@@ -133,7 +133,7 @@ def contains_code(response, **kwargs):
 Point at a Python file and name the function:
 
 ```bash
-aevyra-verdict run data.jsonl -m openai/gpt-4o \
+aevyra-verdict run data.jsonl -m openai/gpt-5.4-mini \
   --custom-metric my_metrics.py:brevity_score \
   --custom-metric my_metrics.py:contains_code
 ```
@@ -151,9 +151,9 @@ runner.add_metric(CustomMetric("brevity", brevity_score))
 ```
 
 ```bash
-aevyra-verdict run data.jsonl -m openai/gpt-4o \
+aevyra-verdict run data.jsonl -m openai/gpt-5.4-mini \
   --metric rouge \
   --metric bleu \
-  --judge openai/gpt-4o-mini \
+  --judge openai/gpt-5.4-nano \
   --custom-metric my_metrics.py:brevity_score
 ```

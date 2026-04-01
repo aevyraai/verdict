@@ -28,7 +28,7 @@ from aevyra_verdict import Dataset, EvalRunner, RougeScore
 ds = Dataset.from_jsonl("data.jsonl")
 
 runner = EvalRunner()
-runner.add_provider("openai", "gpt-4o-mini")
+runner.add_provider("openai", "gpt-5.4-nano")
 runner.add_metric(RougeScore())
 
 results = runner.run(ds)
@@ -107,11 +107,11 @@ ds.summary()          # dict with num_conversations, has_ideals, metadata_keys
 ### Adding providers to a runner
 
 ```python
-runner.add_provider("openai", "gpt-4o-mini")
+runner.add_provider("openai", "gpt-5.4-nano")
 runner.add_provider("anthropic", "claude-haiku-4-5")
 
 # With custom label
-runner.add_provider("openai", "gpt-4o", label="gpt4o")
+runner.add_provider("openai", "gpt-5.4-mini", label="gpt-5.4-mini")
 
 # Local Ollama
 runner.add_provider("local", "llama3.2:1b", base_url="http://localhost:11434/v1")
@@ -128,7 +128,7 @@ runner.add_provider("openrouter", "meta-llama/llama-3.2-3b-instruct")
 ```python
 from aevyra_verdict.providers import get_provider
 
-p = get_provider("openai", "gpt-4o-mini")
+p = get_provider("openai", "gpt-5.4-nano")
 result = p.complete(
     messages=[{"role": "user", "content": "Hello"}],
     max_tokens=256,
@@ -153,7 +153,7 @@ runner.add_metric(BleuScore())    # requires ideal answers
 runner.add_metric(ExactMatch())   # requires ideal answers
 
 # LLM-as-judge (no ideal answer required)
-judge = get_provider("openai", "gpt-4o-mini")
+judge = get_provider("openai", "gpt-5.4-nano")
 runner.add_metric(LLMJudge(judge_provider=judge))
 
 # Custom judge prompt
@@ -222,14 +222,14 @@ summary = results.summary()
 #                 {metric}_mean, {metric}_stdev
 
 # Access a specific model's score
-mean_rouge = results.model_results["openai/gpt-4o-mini"].mean_score("rouge")
+mean_rouge = results.model_results["openai/gpt-5.4-nano"].mean_score("rouge")
 
 # Export
 results.to_json("results.json")
 df = results.to_dataframe()   # pandas DataFrame
 
 # Available models and metrics
-results.models        # ["openai/gpt-4o-mini", "anthropic/claude-haiku"]
+results.models        # ["openai/gpt-5.4-nano", "anthropic/claude-haiku"]
 results.metric_names  # ["rouge", "llm_judge"]
 ```
 
@@ -250,7 +250,7 @@ results.metric_names  # ["rouge", "llm_judge"]
 **Don't call run() with no metrics:**
 ```python
 runner = EvalRunner()
-runner.add_provider("openai", "gpt-4o-mini")
+runner.add_provider("openai", "gpt-5.4-nano")
 # runner.run(ds)  ← raises error: no metrics configured
 runner.add_metric(RougeScore())
 results = runner.run(ds)  # correct
