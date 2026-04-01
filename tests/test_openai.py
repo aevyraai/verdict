@@ -23,7 +23,7 @@ from aevyra_verdict.dataset import Dataset
 from aevyra_verdict.providers import get_provider
 from aevyra_verdict.runner import EvalRunner, RunConfig
 
-OPENAI_MODEL = "gpt-4o-mini"
+OPENAI_MODEL = "gpt-5.4-nano"
 TINY_PROMPT = [{"role": "user", "content": "Reply with just the word 'ok'."}]
 
 

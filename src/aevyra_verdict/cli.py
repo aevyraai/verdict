@@ -111,7 +111,7 @@ def _parse_model_flag(spec: str) -> dict[str, str]:
     if "/" not in spec:
         typer.echo(
             f"[error] Model spec {spec!r} must be in 'provider/model' format.\n"
-            f"  Examples: openai/gpt-4o   anthropic/claude-sonnet-4-20250514   google/gemini-2.0-flash",
+            f"  Examples: openai/gpt-5.4-mini   anthropic/claude-sonnet-4-6   google/gemini-2.0-flash",
             err=True,
         )
         raise typer.Exit(code=1)
@@ -214,7 +214,7 @@ def run(
         Optional[str],
         typer.Option(
             "--judge",
-            help="Use LLM-as-judge with this model spec (e.g. openai/gpt-4o-mini).",
+            help="Use LLM-as-judge with this model spec (e.g. openai/gpt-5.4-nano).",
         ),
     ] = None,
     judge_prompt: Annotated[
@@ -262,7 +262,7 @@ def run(
     \b
     Examples:
       # Inline models
-      aevyra-verdict run data.jsonl -m openai/gpt-4o -m anthropic/claude-sonnet-4-20250514
+      aevyra-verdict run data.jsonl -m openai/gpt-5.4-mini -m anthropic/claude-sonnet-4-6
 
       # Local Ollama instance
       aevyra-verdict run data.jsonl -m local/llama3.2:1b --base-url http://localhost:11434/v1
@@ -271,13 +271,13 @@ def run(
       aevyra-verdict run data.jsonl --config models.yaml
 
       # Custom judge prompt
-      aevyra-verdict run data.jsonl -m openai/gpt-4o --judge openai/gpt-4o-mini --judge-prompt prompt.txt
+      aevyra-verdict run data.jsonl -m openai/gpt-5.4-mini --judge openai/gpt-5.4-nano --judge-prompt prompt.txt
 
       # Custom scoring function
-      aevyra-verdict run data.jsonl -m openai/gpt-4o --custom-metric my_metrics.py:brevity_score
+      aevyra-verdict run data.jsonl -m openai/gpt-5.4-mini --custom-metric my_metrics.py:brevity_score
 
       # Save results
-      aevyra-verdict run data.jsonl --config models.yaml --metric rouge --judge openai/gpt-4o-mini -o results.json
+      aevyra-verdict run data.jsonl --config models.yaml --metric rouge --judge openai/gpt-5.4-nano -o results.json
     """
     from aevyra_verdict.dataset import Dataset
     from aevyra_verdict.runner import EvalRunner, RunConfig
@@ -297,7 +297,7 @@ def run(
         typer.echo(
             "[error] Specify models via --model or --config.\n"
             "  Examples:\n"
-            "    --model openai/gpt-4o\n"
+            "    --model openai/gpt-5.4-mini\n"
             "    --config models.yaml",
             err=True,
         )

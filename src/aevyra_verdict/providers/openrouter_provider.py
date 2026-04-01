@@ -30,8 +30,8 @@ class OpenRouterProvider(Provider):
     OpenRouter exposes a unified OpenAI-compatible API across 200+ models from
     OpenAI, Anthropic, Google, Meta, Mistral, and others. Use model names in
     'provider/model' format as listed on openrouter.ai/models, e.g.:
-        - anthropic/claude-sonnet-4-20250514
-        - openai/gpt-4o
+        - anthropic/claude-sonnet-4-6
+        - openai/gpt-5.4-mini
         - meta-llama/llama-3.1-8b-instruct
         - google/gemini-2.0-flash
 
@@ -42,7 +42,7 @@ class OpenRouterProvider(Provider):
 
     def __init__(
         self,
-        model: str = "anthropic/claude-sonnet-4-20250514",
+        model: str = "anthropic/claude-sonnet-4-6",
         api_key: str | None = None,
         base_url: str | None = None,
         site_url: str | None = None,
@@ -50,7 +50,7 @@ class OpenRouterProvider(Provider):
         **kwargs: Any,
     ):
         """Args:
-            model: Model identifier in 'provider/model' format (e.g. 'openai/gpt-4o').
+            model: Model identifier in 'provider/model' format (e.g. 'openai/gpt-5.4-mini').
             api_key: OpenRouter API key. Defaults to OPENROUTER_API_KEY env var.
             base_url: Override the OpenRouter base URL. Rarely needed.
             site_url: Your site URL, sent as HTTP-Referer. Recommended by OpenRouter

@@ -104,8 +104,8 @@ class EvalRunner:
 
     Basic usage:
         runner = EvalRunner()
-        runner.add_provider("openai", "gpt-4o")
-        runner.add_provider("anthropic", "claude-sonnet-4-20250514")
+        runner.add_provider("openai", "gpt-5.4-mini")
+        runner.add_provider("anthropic", "claude-sonnet-4-6")
         runner.add_metric(ExactMatch())
         results = runner.run(dataset)
     """
@@ -129,7 +129,7 @@ class EvalRunner:
 
         Args:
             provider_name: "openai", "anthropic", "google", "mistral", "cohere".
-            model: Model identifier (e.g., "gpt-4o", "claude-sonnet-4-20250514").
+            model: Model identifier (e.g., "gpt-5.4-mini", "claude-sonnet-4-6").
             label: Display label for this model in results. Defaults to
                    "{provider_name}/{model}".
             api_key: API key override (otherwise uses env var).

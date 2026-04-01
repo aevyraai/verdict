@@ -58,20 +58,20 @@ aevyra-verdict run <dataset> [options]
 
 ```bash
 # Compare two models
-aevyra-verdict run data.jsonl -m openai/gpt-4o -m anthropic/claude-sonnet-4-20250514
+aevyra-verdict run data.jsonl -m openai/gpt-5.4-mini -m anthropic/claude-sonnet-4-6
 
 # Use a config file
 aevyra-verdict run data.jsonl --config models.yaml
 
 # ROUGE + LLM judge, save results
-aevyra-verdict run data.jsonl -m openai/gpt-4o \
+aevyra-verdict run data.jsonl -m openai/gpt-5.4-mini \
   --metric rouge \
-  --judge openai/gpt-4o-mini \
+  --judge openai/gpt-5.4-nano \
   -o results.json
 
 # Custom judge prompt and scoring function
-aevyra-verdict run data.jsonl -m openai/gpt-4o \
-  --judge openai/gpt-4o-mini \
+aevyra-verdict run data.jsonl -m openai/gpt-5.4-mini \
+  --judge openai/gpt-5.4-nano \
   --judge-prompt prompt.md \
   --custom-metric my_metrics.py:brevity_score
 

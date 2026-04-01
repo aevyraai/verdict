@@ -41,8 +41,8 @@ coding_dataset = dataset.filter(category="coding")
 print(f"Coding questions: {len(coding_dataset)}")
 
 runner = EvalRunner()
-runner.add_provider("openai", "gpt-4o")
-runner.add_provider("anthropic", "claude-sonnet-4-20250514")
+runner.add_provider("openai", "gpt-5.4-mini")
+runner.add_provider("anthropic", "claude-sonnet-4-6")
 
 runner.add_metric(RougeScore())
 runner.add_metric(CustomMetric("brevity", brevity_score))

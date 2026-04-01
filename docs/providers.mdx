@@ -26,8 +26,8 @@ Pass `--model` (or `-m`) once per model in `provider/model` format:
 
 ```bash
 aevyra-verdict run data.jsonl \
-  -m openai/gpt-4o \
-  -m anthropic/claude-sonnet-4-20250514 \
+  -m openai/gpt-5.4-mini \
+  -m anthropic/claude-sonnet-4-6 \
   -m google/gemini-2.0-flash
 ```
 
@@ -43,11 +43,11 @@ aevyra-verdict run data.jsonl --config models.yaml
 # models.yaml
 models:
   - provider: openai
-    model: gpt-4o
-    label: gpt-4o
+    model: gpt-5.4-mini
+    label: gpt-5.4-mini
 
   - provider: anthropic
-    model: claude-sonnet-4-20250514
+    model: claude-sonnet-4-6
     label: claude-sonnet
 
   - provider: openrouter
@@ -142,7 +142,7 @@ register_provider("my_provider", MyProvider)
 ```python
 from aevyra_verdict.providers import get_provider
 
-provider = get_provider("openai", "gpt-4o")
+provider = get_provider("openai", "gpt-5.4-mini")
 result = provider.complete([{"role": "user", "content": "Hello"}])
 
 print(result.text)
