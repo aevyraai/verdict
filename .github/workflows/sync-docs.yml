@@ -1,0 +1,31 @@
+name: Sync docs to docs repo
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Update submodule pointer in docs repo
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          git clone https://x-access-token:${GH_TOKEN}@github.com/aevyraai/docs.git /tmp/docs
+          cd /tmp/docs
+
+          git config user.name "Aevyra Bot"
+          git config user.email "bot@aevyra.ai"
+
+          git submodule update --remote verdict-src
+
+          git add verdict-src
+          git diff --cached --quiet && echo "No changes, skipping commit" && exit 0
+
+          git commit -m "chore: update verdict docs submodule"
+          git push origin main
