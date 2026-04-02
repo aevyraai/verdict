@@ -53,12 +53,14 @@ without any API keys:
 
 ```bash
 ollama pull llama3.1
+ollama pull mistral
 ```
 
 ```bash
 aevyra-verdict run dataset.jsonl \
-  -m openai/gpt-5.4-nano \
-  --local ollama/llama3.1
+  -m local/llama3.1 \
+  -m local/mistral \
+  --base-url http://localhost:11434/v1
 ```
 
 Or with a local vLLM instance:
@@ -66,7 +68,8 @@ Or with a local vLLM instance:
 ```bash
 aevyra-verdict run dataset.jsonl \
   -m openai/gpt-5.4-nano \
-  --local http://localhost:8000/v1::meta-llama/Llama-3.1-8B-Instruct
+  -m local/meta-llama/Llama-3.1-8B-Instruct \
+  --base-url http://localhost:8000/v1
 ```
 
 This is useful for benchmarking a fine-tuned model against a hosted baseline before

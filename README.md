@@ -42,6 +42,13 @@ aevyra-verdict run dataset.jsonl \
   -m openai/gpt-5.4-nano \
   -m qwen/qwen3.5-9b \
   -o results.json
+
+# 3. Compare two local Ollama models (no API key needed)
+aevyra-verdict run dataset.jsonl \
+  -m local/llama3.1 \
+  -m local/mistral \
+  --base-url http://localhost:11434/v1 \
+  -o results.json
 ```
 
 Or use the Python API directly:
