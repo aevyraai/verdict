@@ -46,6 +46,58 @@ qwen/qwen3.5-9b                   0.7541      N/A    289.1ms        0
 ------------------------------------------------------------------------
 ```
 
+## Run against a local model
+
+If you have [Ollama](https://ollama.ai) running locally, you can benchmark against it
+without any API keys:
+
+```bash
+ollama pull llama3.1
+```
+
+```bash
+aevyra-verdict run dataset.jsonl \
+  -m openai/gpt-5.4-nano \
+  --local ollama/llama3.1
+```
+
+Or with a local vLLM instance:
+
+```bash
+aevyra-verdict run dataset.jsonl \
+  -m openai/gpt-5.4-nano \
+  --local http://localhost:8000/v1::meta-llama/Llama-3.1-8B-Instruct
+```
+
+This is useful for benchmarking a fine-tuned model against a hosted baseline before
+deciding whether to deploy it.
+
+## Run against a local model
+
+If you have [Ollama](https://ollama.ai) running locally, you can benchmark against it
+without any API keys:
+
+```bash
+ollama pull llama3.1
+```
+
+```bash
+aevyra-verdict run dataset.jsonl \
+  -m openai/gpt-5.4-nano \
+  --local ollama/llama3.1
+```
+
+Or with a local vLLM instance:
+
+```bash
+aevyra-verdict run dataset.jsonl \
+  -m openai/gpt-5.4-nano \
+  --local http://localhost:8000/v1::meta-llama/Llama-3.1-8B-Instruct
+```
+
+This is useful for benchmarking a fine-tuned model against a hosted baseline before
+deciding whether to deploy it.
+
 ## Save results
 
 ```bash
