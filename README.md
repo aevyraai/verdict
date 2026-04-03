@@ -38,13 +38,13 @@ You only need API keys for the providers you actually use.
 aevyra-verdict providers
 
 # 2. Compare models on a dataset and save results
-aevyra-verdict run dataset.jsonl \
+aevyra-verdict run examples/sample_data.jsonl \
   -m openai/gpt-5.4-nano \
   -m qwen/qwen3.5-9b \
   -o results.json
 
 # 3. Compare two local Ollama models (no API key needed)
-aevyra-verdict run dataset.jsonl \
+aevyra-verdict run examples/sample_data.jsonl \
   -m local/llama3.1 \
   -m local/mistral \
   --base-url http://localhost:11434/v1 \
@@ -256,7 +256,7 @@ After `pip install -e .`, the `aevyra-verdict` command is available.
 Preview a dataset before running — shows sample count, whether ideals are present, and the first sample. No API calls made.
 
 ```bash
-aevyra-verdict inspect dataset.jsonl
+aevyra-verdict inspect examples/sample_data.jsonl
 ```
 
 ### Check configured providers
@@ -272,7 +272,7 @@ aevyra-verdict providers
 Pass `--model` (or `-m`) once per model, in `provider/model` format:
 
 ```bash
-aevyra-verdict run dataset.jsonl \
+aevyra-verdict run examples/sample_data.jsonl \
   -m openai/gpt-5.4-nano \
   -m qwen/qwen3.5-9b \
   -m google/gemini-2.0-flash
@@ -281,7 +281,7 @@ aevyra-verdict run dataset.jsonl \
 For more than a couple of models, or when you want to reuse a configuration, use a config file instead:
 
 ```bash
-aevyra-verdict run dataset.jsonl --config models.yaml
+aevyra-verdict run examples/sample_data.jsonl --config models.yaml
 ```
 
 The config file supports JSON, YAML, and TOML. Each model entry takes `provider` and `model`, with optional `label`, `api_key`, and `base_url`:
@@ -312,19 +312,19 @@ Start a local vLLM server with: `vllm serve meta-llama/Llama-3.1-8B-Instruct`
 Use `--metric` for built-in options (`rouge`, `bleu`, `exact`) and repeat for multiple:
 
 ```bash
-aevyra-verdict run dataset.jsonl -m openai/gpt-5.4-nano --metric rouge --metric bleu
+aevyra-verdict run examples/sample_data.jsonl -m openai/gpt-5.4-nano --metric rouge --metric bleu
 ```
 
 Add an LLM-as-judge with `--judge`:
 
 ```bash
-aevyra-verdict run dataset.jsonl -m openai/gpt-5.4-nano --judge openai/gpt-5.4
+aevyra-verdict run examples/sample_data.jsonl -m openai/gpt-5.4-nano --judge openai/gpt-5.4
 ```
 
 To customise the judge's evaluation criteria, pass a prompt template file. The recommended format is `.md` since judge prompts tend to have structure. Use `{criteria}`, `{conversation}`, `{response}`, and `{ideal_section}` as placeholders:
 
 ```bash
-aevyra-verdict run dataset.jsonl -m openai/gpt-5.4-nano \
+aevyra-verdict run examples/sample_data.jsonl -m openai/gpt-5.4-nano \
   --judge openai/gpt-5.4 \
   --judge-prompt examples/judge_prompt.md
 ```
@@ -334,7 +334,7 @@ aevyra-verdict run dataset.jsonl -m openai/gpt-5.4-nano \
 To use a custom Python scoring function, point at a file and name the function:
 
 ```bash
-aevyra-verdict run dataset.jsonl -m openai/gpt-5.4-nano \
+aevyra-verdict run examples/sample_data.jsonl -m openai/gpt-5.4-nano \
   --custom-metric examples/custom_metrics.py:brevity_score \
   --custom-metric examples/custom_metrics.py:contains_code
 ```
@@ -344,7 +344,7 @@ The function receives `(response, ideal=None, messages=None)` and returns either
 Save results to JSON with `-o`:
 
 ```bash
-aevyra-verdict run dataset.jsonl --config models.yaml -o results.json
+aevyra-verdict run examples/sample_data.jsonl --config models.yaml -o results.json
 ```
 
 ### Results

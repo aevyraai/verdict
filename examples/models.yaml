@@ -1,7 +1,7 @@
 # models.yaml — specify which models to compare in an eval run
 #
 # Usage:
-#   aevyra-verdict run dataset.jsonl --config models.yaml
+#   aevyra-verdict run examples/sample_data.jsonl --config models.yaml
 
 models:
   - provider: openai
