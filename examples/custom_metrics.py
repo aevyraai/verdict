@@ -15,8 +15,8 @@
 """Example custom metric functions for use with --custom-metric.
 
 Usage:
-  aevyra-verdict run dataset.jsonl -m openai/gpt-5.4-nano --custom-metric custom_metrics.py:brevity_score
-  aevyra-verdict run dataset.jsonl -m openai/gpt-5.4-nano --custom-metric custom_metrics.py:contains_code
+  aevyra-verdict run examples/sample_data.jsonl -m openai/gpt-5.4-nano --custom-metric custom_metrics.py:brevity_score
+  aevyra-verdict run examples/sample_data.jsonl -m openai/gpt-5.4-nano --custom-metric custom_metrics.py:contains_code
 """
 
 
