@@ -34,6 +34,7 @@ def _run_one():
 
 def _run_eval(dataset_path):
     from aevyra_verdict.metrics import RougeScore
+
     ds = Dataset.from_jsonl(dataset_path)
     config = RunConfig(max_tokens=256, temperature=0.0, max_workers=2)
     runner = EvalRunner(config=config)

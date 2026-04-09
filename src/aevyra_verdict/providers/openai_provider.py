@@ -35,7 +35,13 @@ class OpenAIProvider(Provider):
         **kwargs: Any,
     ):
         super().__init__(model=model, api_key=api_key, base_url=base_url, **kwargs)
-        from openai import OpenAI
+        try:
+            from openai import OpenAI
+        except ImportError:
+            raise ImportError(
+                "The OpenAI provider requires the openai package. "
+                "Install it with: pip install aevyra-verdict[openai]"
+            )
 
         self._client = OpenAI(
             api_key=api_key or os.environ.get("OPENAI_API_KEY"),

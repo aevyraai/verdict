@@ -16,7 +16,6 @@
 
 from __future__ import annotations
 
-import math
 import random
 import sys
 import time
@@ -79,8 +78,7 @@ def _is_rate_limit_error(exc: Exception) -> bool:
     # Last resort: string match on the message
     msg = str(exc).lower()
     return any(
-        token in msg
-        for token in ("rate limit", "rate_limit", "quota", "429", "too many requests")
+        token in msg for token in ("rate limit", "rate_limit", "quota", "429", "too many requests")
     )
 
 
@@ -90,7 +88,7 @@ def _backoff_delay(attempt: int, config: RunConfig) -> float:
     On attempt 0 the base delay applies; each subsequent attempt doubles it,
     capped at retry_max_delay. Jitter is a random ± fraction of the computed delay.
     """
-    delay = min(config.retry_base_delay * (2 ** attempt), config.retry_max_delay)
+    delay = min(config.retry_base_delay * (2**attempt), config.retry_max_delay)
     jitter = delay * config.retry_jitter * (2 * random.random() - 1)
     return max(0.0, delay + jitter)
 
@@ -140,9 +138,7 @@ class EvalRunner:
         """
         from aevyra_verdict.providers import get_provider
 
-        provider = get_provider(
-            provider_name, model, api_key=api_key, base_url=base_url, **kwargs
-        )
+        provider = get_provider(provider_name, model, api_key=api_key, base_url=base_url, **kwargs)
         key = label or f"{provider_name}/{model}"
         self.providers[key] = provider
         return self
@@ -241,10 +237,7 @@ class EvalRunner:
             return idx, completion, sample_scores, error
 
         with ThreadPoolExecutor(max_workers=self.config.max_workers) as pool:
-            futures = [
-                pool.submit(process_sample, idx, conv)
-                for idx, conv in enumerate(dataset)
-            ]
+            futures = [pool.submit(process_sample, idx, conv) for idx, conv in enumerate(dataset)]
             for future in as_completed(futures):
                 idx, completion, sample_scores, error = future.result()
                 completions[idx] = completion

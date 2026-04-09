@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import json
 import statistics
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -60,15 +60,11 @@ class ModelResult:
         return statistics.mean(values) if values else None
 
     def median_score(self, metric_name: str) -> float | None:
-        values = [
-            s[metric_name].score for s in self.scores if metric_name in s
-        ]
+        values = [s[metric_name].score for s in self.scores if metric_name in s]
         return statistics.median(values) if values else None
 
     def stdev_score(self, metric_name: str) -> float | None:
-        values = [
-            s[metric_name].score for s in self.scores if metric_name in s
-        ]
+        values = [s[metric_name].score for s in self.scores if metric_name in s]
         return statistics.stdev(values) if len(values) > 1 else None
 
     def mean_latency_ms(self) -> float | None:
@@ -147,9 +143,7 @@ class EvalResults:
             mean_str = f"{mean:>8.4f}" if mean is not None else f"{'N/A':>8}"
             stdev_str = f"{stdev:>8.4f}" if stdev is not None else f"{'N/A':>8}"
             latency_str = f"{latency:>8.1f}ms" if latency is not None else f"{'N/A':>10}"
-            lines.append(
-                f"{label:<35} {mean_str} {stdev_str} {latency_str} {mr.num_errors:>7}"
-            )
+            lines.append(f"{label:<35} {mean_str} {stdev_str} {latency_str} {mr.num_errors:>7}")
 
         lines.append("-" * 72)
         return "\n".join(lines)
@@ -157,6 +151,7 @@ class EvalResults:
     def to_dataframe(self):
         """Convert summary to a pandas DataFrame."""
         import pandas as pd
+
         return pd.DataFrame.from_dict(self.summary(), orient="index")
 
     def to_json(self, path: str | Path | None = None) -> str:

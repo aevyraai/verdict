@@ -29,7 +29,7 @@ jobs:
         run: pip install -e ".[dev]"
 
       - name: Run unit tests
-        run: pytest tests/test_dataset.py tests/test_cli.py -v
+        run: pytest tests/test_dataset.py tests/test_cli.py tests/test_provider_imports.py -v
 
   # ---------------------------------------------------------------------------
   # Ollama integration — pulls a small model, free, no secrets needed
@@ -47,7 +47,7 @@ jobs:
           cache: pip
 
       - name: Install package
-        run: pip install -e ".[dev]"
+        run: pip install -e ".[dev,openai]"
 
       - name: Install Ollama
         run: curl -fsSL https://ollama.com/install.sh | sh
@@ -86,7 +86,7 @@ jobs:
           cache: pip
 
       - name: Install package
-        run: pip install -e ".[dev]"
+        run: pip install -e ".[dev,openai]"
 
       - name: Free disk space
         run: |
@@ -143,6 +143,7 @@ jobs:
   openrouter:
     name: OpenRouter integration
     runs-on: ubuntu-latest
+    if: false  # skipped — API key not available in CI
 
     steps:
       - uses: actions/checkout@v4
@@ -173,6 +174,7 @@ jobs:
   openai:
     name: OpenAI integration
     runs-on: ubuntu-latest
+    if: false  # skipped — API key not available in CI
 
     steps:
       - uses: actions/checkout@v4

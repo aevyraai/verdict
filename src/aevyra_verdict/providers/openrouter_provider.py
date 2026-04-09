@@ -50,12 +50,12 @@ class OpenRouterProvider(Provider):
         **kwargs: Any,
     ):
         """Args:
-            model: Model identifier in 'provider/model' format (e.g. 'openai/gpt-5.4-nano').
-            api_key: OpenRouter API key. Defaults to OPENROUTER_API_KEY env var.
-            base_url: Override the OpenRouter base URL. Rarely needed.
-            site_url: Your site URL, sent as HTTP-Referer. Recommended by OpenRouter
-                      for attribution in their analytics.
-            app_name: Your app name, sent as X-Title.
+        model: Model identifier in 'provider/model' format (e.g. 'openai/gpt-5.4-nano').
+        api_key: OpenRouter API key. Defaults to OPENROUTER_API_KEY env var.
+        base_url: Override the OpenRouter base URL. Rarely needed.
+        site_url: Your site URL, sent as HTTP-Referer. Recommended by OpenRouter
+                  for attribution in their analytics.
+        app_name: Your app name, sent as X-Title.
         """
         super().__init__(
             model=model,
@@ -63,7 +63,13 @@ class OpenRouterProvider(Provider):
             base_url=base_url or _OPENROUTER_BASE_URL,
             **kwargs,
         )
-        from openai import OpenAI
+        try:
+            from openai import OpenAI
+        except ImportError:
+            raise ImportError(
+                "The OpenRouter provider requires the openai package. "
+                "Install it with: pip install aevyra-verdict[openai]"
+            )
 
         resolved_key = api_key or os.environ.get("OPENROUTER_API_KEY")
         if not resolved_key:

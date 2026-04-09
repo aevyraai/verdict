@@ -173,7 +173,8 @@ def _convert_alpaca(record: dict[str, Any]) -> dict[str, Any]:
         "messages": messages,
         "ideal": output or None,
         "metadata": {
-            k: v for k, v in record.items()
+            k: v
+            for k, v in record.items()
             if k not in ("instruction", "input", "output", "prompt", "response", "system")
         },
     }
@@ -193,6 +194,7 @@ def _normalize(record: dict[str, Any], fmt: Format) -> dict[str, Any]:
 # ---------------------------------------------------------------------------
 # Dataset
 # ---------------------------------------------------------------------------
+
 
 class Dataset:
     """A collection of eval conversations.
@@ -248,9 +250,7 @@ class Dataset:
 
                 # Detect format once from the first record
                 if detected_format is None:
-                    detected_format = (
-                        _detect_format(data) if format == "auto" else format
-                    )
+                    detected_format = _detect_format(data) if format == "auto" else format
 
                 try:
                     normalized = _normalize(data, detected_format)
@@ -283,9 +283,7 @@ class Dataset:
         conversations = []
         for item in items:
             if detected_format is None:
-                detected_format = (
-                    _detect_format(item) if format == "auto" else format
-                )
+                detected_format = _detect_format(item) if format == "auto" else format
             normalized = _normalize(item, detected_format)
             if normalized.get("messages"):
                 conversations.append(Conversation.from_dict(normalized))
@@ -297,8 +295,7 @@ class Dataset:
         Example: dataset.filter(category="reasoning", difficulty="hard")
         """
         filtered = [
-            c for c in self.conversations
-            if all(c.metadata.get(k) == v for k, v in kwargs.items())
+            c for c in self.conversations if all(c.metadata.get(k) == v for k, v in kwargs.items())
         ]
         return Dataset(conversations=filtered, name=f"{self.name}_filtered")
 
@@ -312,7 +309,5 @@ class Dataset:
             "name": self.name,
             "num_conversations": len(self.conversations),
             "has_ideals": self.has_ideals(),
-            "metadata_keys": sorted(
-                {k for c in self.conversations for k in c.metadata}
-            ),
+            "metadata_keys": sorted({k for c in self.conversations for k in c.metadata}),
         }

@@ -35,7 +35,13 @@ class AnthropicProvider(Provider):
         **kwargs: Any,
     ):
         super().__init__(model=model, api_key=api_key, base_url=base_url, **kwargs)
-        import anthropic
+        try:
+            import anthropic
+        except ImportError:
+            raise ImportError(
+                "The Anthropic provider requires the anthropic package. "
+                "Install it with: pip install aevyra-verdict[anthropic]"
+            )
 
         client_kwargs = {"api_key": api_key or os.environ.get("ANTHROPIC_API_KEY")}
         if base_url:

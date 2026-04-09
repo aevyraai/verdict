@@ -101,7 +101,7 @@ class RougeScore(Metric):
 
     def __init__(self, variant: str = "rougeL"):
         """Args:
-            variant: Which ROUGE variant to use. One of "rouge1", "rouge2", "rougeL".
+        variant: Which ROUGE variant to use. One of "rouge1", "rouge2", "rougeL".
         """
         self.variant = variant
 

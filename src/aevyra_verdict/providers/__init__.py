@@ -32,7 +32,14 @@ def _register_builtins():
     from aevyra_verdict.providers.cohere_provider import CohereProvider
     from aevyra_verdict.providers.openrouter_provider import OpenRouterProvider
 
-    for cls in [OpenAIProvider, AnthropicProvider, GoogleProvider, MistralProvider, CohereProvider, OpenRouterProvider]:
+    for cls in [
+        OpenAIProvider,
+        AnthropicProvider,
+        GoogleProvider,
+        MistralProvider,
+        CohereProvider,
+        OpenRouterProvider,
+    ]:
         _PROVIDER_REGISTRY[cls.name] = cls
 
     # 'local' is an alias for OpenAI-compatible local endpoints (Ollama, vLLM).
@@ -40,7 +47,9 @@ def _register_builtins():
     class LocalProvider(OpenAIProvider):
         name = "local"
 
-        def __init__(self, model: str, api_key: str | None = None, base_url: str | None = None, **kwargs):
+        def __init__(
+            self, model: str, api_key: str | None = None, base_url: str | None = None, **kwargs
+        ):
             # Ollama/vLLM don't need a real key; use a placeholder so openai client doesn't complain
             super().__init__(
                 model=model,
@@ -50,7 +59,9 @@ def _register_builtins():
             )
 
         def complete(self, messages, temperature=0.0, max_tokens=1024, **kwargs):
-            result = super().complete(messages, temperature=temperature, max_tokens=max_tokens, **kwargs)
+            result = super().complete(
+                messages, temperature=temperature, max_tokens=max_tokens, **kwargs
+            )
             result.provider = "local"
             return result
 
