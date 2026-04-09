@@ -63,7 +63,13 @@ class OpenRouterProvider(Provider):
             base_url=base_url or _OPENROUTER_BASE_URL,
             **kwargs,
         )
-        from openai import OpenAI
+        try:
+            from openai import OpenAI
+        except ImportError:
+            raise ImportError(
+                "The OpenRouter provider requires the openai package. "
+                "Install it with: pip install aevyra-verdict[openai]"
+            )
 
         resolved_key = api_key or os.environ.get("OPENROUTER_API_KEY")
         if not resolved_key:
