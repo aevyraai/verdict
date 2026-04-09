@@ -28,7 +28,17 @@ against SOTA closed models on your workload — and identify exactly where the g
 pip install aevyra-verdict
 ```
 
-This pulls in the SDKs for OpenAI, Anthropic, Google (Gemini), Mistral, and Cohere.
+Provider SDKs are optional extras — install only what you need:
+
+```bash
+pip install aevyra-verdict[openai]      # OpenAI + OpenRouter + local (Ollama/vLLM)
+pip install aevyra-verdict[anthropic]   # Anthropic
+pip install aevyra-verdict[google]      # Google Gemini
+pip install aevyra-verdict[mistral]     # Mistral
+pip install aevyra-verdict[cohere]      # Cohere
+pip install aevyra-verdict[all]         # everything
+```
+
 You only need API keys for the providers you actually use.
 
 ## Quick start
@@ -209,7 +219,7 @@ register_provider("my_provider", MyProvider)
 
 ### Metrics
 
-**Reference-based** (requires `ideal` in the dataset):
+**Reference-based** (requires `ideal` answers in the dataset):
 
 ```python
 from aevyra_verdict import ExactMatch, BleuScore, RougeScore
@@ -219,6 +229,8 @@ ExactMatch(case_sensitive=True)
 BleuScore(max_ngram=4)
 RougeScore(variant="rougeL")        # also "rouge1", "rouge2"
 ```
+
+Using these on a dataset without ideal answers raises a `ValueError` upfront — see [Label-free evaluation](#label-free-evaluation) below.
 
 **LLM-as-judge** (works with or without `ideal`):
 
@@ -231,7 +243,18 @@ LLMJudge(judge_provider=judge)
 LLMJudge(judge_provider=judge, criteria="Focus only on factual accuracy.")
 ```
 
-The judge scores on a 1–5 scale (normalized to 0.0–1.0) and returns its reasoning.
+The judge scores on a 1–5 scale (normalized to 0.0–1.0) and returns its reasoning in `ScoreResult.reasoning`.
+
+Score across multiple dimensions in a single API call:
+
+```python
+LLMJudge(
+    judge_provider=judge,
+    dimensions=["clarity", "accuracy", "conciseness"],
+)
+# result.score       → mean across all dimensions (0.0–1.0)
+# result.sub_scores  → {"clarity": 0.8, "accuracy": 0.6, "conciseness": 1.0}
+```
 
 **Custom metrics:**
 
@@ -246,6 +269,25 @@ CustomMetric("word_count", word_count_score)
 
 Custom functions return either a `float` or a `dict` with at least a `"score"` key
 (optionally `"reasoning"` and any other details).
+
+### Label-free evaluation
+
+When you have no reference answers, use `LLMJudge` (or a `CustomMetric`) instead of reference-based metrics. The runner validates this upfront and gives a clear error if you accidentally pair a label-free dataset with `ExactMatch`, `BleuScore`, or `RougeScore`.
+
+```python
+# Dataset with no ideal answers
+dataset = Dataset.from_jsonl("questions.jsonl")
+print(dataset.has_ideals())  # False
+
+judge = get_provider("openai", "gpt-5.4")
+
+runner = EvalRunner()
+runner.add_provider("openai", "gpt-5.4-nano")
+runner.add_metric(LLMJudge(judge_provider=judge))
+results = runner.run(dataset)  # works fine — no labels needed
+```
+
+See `examples/label_free_eval.py` for a complete working example.
 
 ## CLI
 
@@ -401,7 +443,9 @@ Bug reports and PRs are welcome. Open an issue first for anything larger than a 
 reference implementation.
 
 **Adding a metric** — subclass `Metric` in `src/aevyra_verdict/metrics/`, implement
-`score()`, and add it to the exports in `metrics/__init__.py`. See `reference.py` for
+`score()`, and add it to the exports in `metrics/__init__.py`. If your metric requires
+a reference answer, set `requires_ideal = True` on the class — the runner will then
+raise a clear error when it's used on a label-free dataset. See `reference.py` for
 reference-based metrics and `judge.py` for LLM-as-judge.
 
 ## License
