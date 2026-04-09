@@ -39,9 +39,7 @@ from aevyra_verdict.runner import EvalRunner, RunConfig
 
 def _label_free_dataset(tmp_path, n: int = 2) -> Dataset:
     """Return a Dataset with no ideal answers."""
-    samples = [
-        {"messages": [{"role": "user", "content": f"Question {i}"}]} for i in range(n)
-    ]
+    samples = [{"messages": [{"role": "user", "content": f"Question {i}"}]} for i in range(n)]
     path = tmp_path / "label_free.jsonl"
     path.write_text("\n".join(json.dumps(s) for s in samples))
     return Dataset.from_jsonl(path)
