@@ -108,19 +108,19 @@ class LLMJudge(Metric):
         temperature: float = 0.0,
     ):
         """Args:
-            judge_provider: A configured Provider instance to use as the judge.
-            criteria: Evaluation criteria text (single-score mode only).
-                Defaults to accuracy/helpfulness/clarity/completeness.
-            prompt_template: Fully custom prompt template. Single-score mode
-                uses ``{criteria}``, ``{conversation}``, ``{response}``,
-                ``{ideal_section}`` placeholders. Multi-dimensional mode uses
-                ``{dimensions_list}``, ``{conversation}``, ``{response}``,
-                ``{ideal_section}``.
-            dimensions: List of dimension names for multi-dimensional scoring
-                (e.g. ``["accuracy", "helpfulness", "tone"]``). When set,
-                each dimension is scored separately in one API call and
-                exposed in ``ScoreResult.sub_scores``.
-            temperature: Temperature for judge calls.
+        judge_provider: A configured Provider instance to use as the judge.
+        criteria: Evaluation criteria text (single-score mode only).
+            Defaults to accuracy/helpfulness/clarity/completeness.
+        prompt_template: Fully custom prompt template. Single-score mode
+            uses ``{criteria}``, ``{conversation}``, ``{response}``,
+            ``{ideal_section}`` placeholders. Multi-dimensional mode uses
+            ``{dimensions_list}``, ``{conversation}``, ``{response}``,
+            ``{ideal_section}``.
+        dimensions: List of dimension names for multi-dimensional scoring
+            (e.g. ``["accuracy", "helpfulness", "tone"]``). When set,
+            each dimension is scored separately in one API call and
+            exposed in ``ScoreResult.sub_scores``.
+        temperature: Temperature for judge calls.
         """
         self.judge = judge_provider
         self.dimensions = dimensions  # None = single-score mode
@@ -201,10 +201,7 @@ class LLMJudge(Metric):
         dim_scores, reasoning = self._parse_multi(judge_result.text, self.dimensions)
 
         # Normalize each dimension (1–5 → 0–1) and store as sub_scores
-        sub_scores = {
-            f"{self.name}_{dim}": (raw - 1) / 4.0
-            for dim, raw in dim_scores.items()
-        }
+        sub_scores = {f"{self.name}_{dim}": (raw - 1) / 4.0 for dim, raw in dim_scores.items()}
         composite = sum(sub_scores.values()) / len(sub_scores) if sub_scores else 0.0
 
         return ScoreResult(
@@ -232,9 +229,7 @@ class LLMJudge(Metric):
             reasoning = text
         return max(1, min(5, score)), reasoning
 
-    def _parse_multi(
-        self, text: str, dimensions: list[str]
-    ) -> tuple[dict[str, int], str]:
+    def _parse_multi(self, text: str, dimensions: list[str]) -> tuple[dict[str, int], str]:
         """Parse a multi-dimensional judge response. Returns ({dim: score}, reasoning)."""
         text = self._strip_code_fence(text)
         reasoning = ""

@@ -26,6 +26,7 @@ import pytest
 # Custom markers
 # ---------------------------------------------------------------------------
 
+
 def pytest_configure(config):
     config.addinivalue_line("markers", "ollama: requires a running Ollama server")
     config.addinivalue_line("markers", "vllm: requires a running vLLM server")
@@ -37,8 +38,10 @@ def pytest_configure(config):
 # Skip helpers — tests are skipped automatically if the service/key is absent
 # ---------------------------------------------------------------------------
 
+
 def _ollama_available() -> bool:
     import urllib.request
+
     try:
         urllib.request.urlopen("http://localhost:11434/api/tags", timeout=2)
         return True
@@ -48,6 +51,7 @@ def _ollama_available() -> bool:
 
 def _vllm_available() -> bool:
     import urllib.request
+
     try:
         urllib.request.urlopen("http://localhost:8000/health", timeout=2)
         return True
@@ -86,7 +90,6 @@ GSM8K_PATH = Path(__file__).parent.parent / "examples" / "gsm8k_sample.jsonl"
 @pytest.fixture
 def gsm8k_dataset(tmp_path):
     """First 5 samples from GSM8K — used for integration tests."""
-    import json
     if not GSM8K_PATH.exists():
         pytest.skip("gsm8k_sample.jsonl not present — run: python examples/fetch_gsm8k.py")
     lines = GSM8K_PATH.read_text().splitlines()[:5]

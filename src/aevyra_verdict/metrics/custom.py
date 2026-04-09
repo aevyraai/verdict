@@ -64,6 +64,4 @@ class CustomMetric(Metric):
                 reasoning=result.get("reasoning"),
             )
 
-        raise TypeError(
-            f"Custom metric function must return a float or dict, got {type(result)}"
-        )
+        raise TypeError(f"Custom metric function must return a float or dict, got {type(result)}")

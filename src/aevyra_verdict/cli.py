@@ -40,6 +40,7 @@ app = typer.Typer(
 # Config file loading
 # ---------------------------------------------------------------------------
 
+
 def _load_config(path: Path) -> dict[str, Any]:
     """Load a models config file. Supports JSON, YAML, and TOML."""
     suffix = path.suffix.lower()
@@ -52,8 +53,7 @@ def _load_config(path: Path) -> dict[str, Any]:
             import yaml
         except ImportError:
             typer.echo(
-                "[error] PyYAML is needed to read .yaml config files.\n"
-                "  Fix: pip install pyyaml",
+                "[error] PyYAML is needed to read .yaml config files.\n  Fix: pip install pyyaml",
                 err=True,
             )
             raise typer.Exit(code=1)
@@ -106,6 +106,7 @@ def _models_from_config(path: Path) -> list[dict[str, Any]]:
 # Model flag parsing
 # ---------------------------------------------------------------------------
 
+
 def _parse_model_flag(spec: str) -> dict[str, str]:
     """Parse 'provider/model' flag into a model dict."""
     if "/" not in spec:
@@ -144,6 +145,7 @@ def _check_api_key(provider: str, base_url: str | None = None) -> None:
 # Custom metric loading
 # ---------------------------------------------------------------------------
 
+
 def _load_custom_metric(spec: str):
     """Load a custom scoring function from 'path/to/file.py:function_name'.
 
@@ -152,8 +154,8 @@ def _load_custom_metric(spec: str):
     """
     if ":" not in spec:
         typer.echo(
-            f"[error] --custom-metric must be in 'file.py:function_name' format.\n"
-            f"  Example: --custom-metric my_metrics.py:brevity_score",
+            "[error] --custom-metric must be in 'file.py:function_name' format.\n"
+            "  Example: --custom-metric my_metrics.py:brevity_score",
             err=True,
         )
         raise typer.Exit(code=1)
@@ -184,23 +186,26 @@ def _load_custom_metric(spec: str):
 # Commands
 # ---------------------------------------------------------------------------
 
+
 @app.command()
 def run(
     dataset: Annotated[Path, typer.Argument(help="Path to a JSONL dataset file.")],
     model: Annotated[
         list[str],
         typer.Option(
-            "-m", "--model",
+            "-m",
+            "--model",
             help="Model in 'provider/model' format. Repeat for multiple. "
-                 "Cannot be combined with --config.",
+            "Cannot be combined with --config.",
         ),
     ] = [],
     config: Annotated[
         Optional[Path],
         typer.Option(
-            "-c", "--config",
+            "-c",
+            "--config",
             help="Path to a models config file (.yaml, .json, or .toml). "
-                 "Cannot be combined with --model.",
+            "Cannot be combined with --model.",
         ),
     ] = None,
     metric: Annotated[
@@ -222,15 +227,14 @@ def run(
         typer.Option(
             "--judge-prompt",
             help="Path to a prompt template file (.md or .txt). "
-                 "Use {criteria}, {conversation}, {response}, {ideal_section} as placeholders.",
+            "Use {criteria}, {conversation}, {response}, {ideal_section} as placeholders.",
         ),
     ] = None,
     custom_metric: Annotated[
         list[str],
         typer.Option(
             "--custom-metric",
-            help="Custom scoring function in 'file.py:function_name' format. "
-                 "Repeat for multiple.",
+            help="Custom scoring function in 'file.py:function_name' format. Repeat for multiple.",
         ),
     ] = [],
     output: Annotated[
@@ -310,8 +314,8 @@ def run(
     for cm_spec in custom_metric:
         if ":" not in cm_spec:
             typer.echo(
-                f"[error] --custom-metric must be in 'file.py:function_name' format.\n"
-                f"  Example: --custom-metric my_metrics.py:brevity_score",
+                "[error] --custom-metric must be in 'file.py:function_name' format.\n"
+                "  Example: --custom-metric my_metrics.py:brevity_score",
                 err=True,
             )
             raise typer.Exit(code=1)
@@ -386,10 +390,12 @@ def run(
             prompt_template = judge_prompt.read_text()
             typer.echo(f"Using custom judge prompt from: {judge_prompt}")
 
-        runner.add_metric(LLMJudge(
-            judge_provider=judge_provider,
-            prompt_template=prompt_template,
-        ))
+        runner.add_metric(
+            LLMJudge(
+                judge_provider=judge_provider,
+                prompt_template=prompt_template,
+            )
+        )
 
     # --- Add custom Python metrics ---
     for cm_spec in custom_metric:

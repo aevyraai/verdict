@@ -40,21 +40,23 @@ def fetch_gsm8k(n=50, split="test", output="examples/gsm8k_sample.jsonl"):
         # GSM8K answers end with "#### <number>" — extract the final number as ideal
         ideal = answer.split("####")[-1].strip() if "####" in answer else answer.strip()
 
-        samples.append({
-            "messages": [
-                {
-                    "role": "system",
-                    "content": (
-                        "You are a math tutor. Solve the problem step by step, "
-                        "then end your response with '#### <answer>' where <answer> "
-                        "is just the final number."
-                    ),
-                },
-                {"role": "user", "content": question},
-            ],
-            "ideal": ideal,
-            "metadata": {"source": "gsm8k", "split": split},
-        })
+        samples.append(
+            {
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": (
+                            "You are a math tutor. Solve the problem step by step, "
+                            "then end your response with '#### <answer>' where <answer> "
+                            "is just the final number."
+                        ),
+                    },
+                    {"role": "user", "content": question},
+                ],
+                "ideal": ideal,
+                "metadata": {"source": "gsm8k", "split": split},
+            }
+        )
 
     out = Path(output)
     out.write_text("\n".join(json.dumps(s) for s in samples))

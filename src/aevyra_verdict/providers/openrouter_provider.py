@@ -50,12 +50,12 @@ class OpenRouterProvider(Provider):
         **kwargs: Any,
     ):
         """Args:
-            model: Model identifier in 'provider/model' format (e.g. 'openai/gpt-5.4-nano').
-            api_key: OpenRouter API key. Defaults to OPENROUTER_API_KEY env var.
-            base_url: Override the OpenRouter base URL. Rarely needed.
-            site_url: Your site URL, sent as HTTP-Referer. Recommended by OpenRouter
-                      for attribution in their analytics.
-            app_name: Your app name, sent as X-Title.
+        model: Model identifier in 'provider/model' format (e.g. 'openai/gpt-5.4-nano').
+        api_key: OpenRouter API key. Defaults to OPENROUTER_API_KEY env var.
+        base_url: Override the OpenRouter base URL. Rarely needed.
+        site_url: Your site URL, sent as HTTP-Referer. Recommended by OpenRouter
+                  for attribution in their analytics.
+        app_name: Your app name, sent as X-Title.
         """
         super().__init__(
             model=model,
