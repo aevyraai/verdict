@@ -25,6 +25,7 @@ class ExactMatch(Metric):
     """Exact string match between response and ideal (after normalization)."""
 
     name = "exact_match"
+    requires_ideal = True
 
     def __init__(self, case_sensitive: bool = False, strip: bool = True):
         self.case_sensitive = case_sensitive
@@ -58,6 +59,7 @@ class BleuScore(Metric):
     """BLEU score using NLTK's sentence_bleu."""
 
     name = "bleu"
+    requires_ideal = True
 
     def __init__(self, max_ngram: int = 4):
         self.max_ngram = max_ngram
@@ -98,6 +100,7 @@ class RougeScore(Metric):
     """ROUGE score using the rouge-score library."""
 
     name = "rouge"
+    requires_ideal = True
 
     def __init__(self, variant: str = "rougeL"):
         """Args:
