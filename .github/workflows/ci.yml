@@ -47,7 +47,7 @@ jobs:
           cache: pip
 
       - name: Install package
-        run: pip install -e ".[dev]"
+        run: pip install -e ".[dev,openai]"
 
       - name: Install Ollama
         run: curl -fsSL https://ollama.com/install.sh | sh
@@ -86,7 +86,7 @@ jobs:
           cache: pip
 
       - name: Install package
-        run: pip install -e ".[dev]"
+        run: pip install -e ".[dev,openai]"
 
       - name: Free disk space
         run: |
