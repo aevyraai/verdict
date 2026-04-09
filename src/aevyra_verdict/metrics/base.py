@@ -29,6 +29,7 @@ class ScoreResult:
     metric_name: str
     details: dict[str, Any] | None = None  # Metric-specific breakdown
     reasoning: str | None = None  # For LLM-as-judge, the judge's reasoning
+    sub_scores: dict[str, float] | None = None  # Per-dimension scores (e.g. multi-dimensional judge)
 
 
 class Metric(ABC):

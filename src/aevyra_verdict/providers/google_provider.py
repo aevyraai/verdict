@@ -37,7 +37,13 @@ class GoogleProvider(Provider):
         **kwargs: Any,
     ):
         super().__init__(model=model, api_key=api_key, base_url=base_url, **kwargs)
-        from google import genai
+        try:
+            from google import genai
+        except ImportError:
+            raise ImportError(
+                "The Google provider requires the google-genai package. "
+                "Install it with: pip install aevyra-verdict[google]"
+            )
 
         self._client = genai.Client(
             api_key=api_key or os.environ.get("GOOGLE_API_KEY"),

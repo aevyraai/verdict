@@ -35,7 +35,13 @@ class MistralProvider(Provider):
         **kwargs: Any,
     ):
         super().__init__(model=model, api_key=api_key, base_url=base_url, **kwargs)
-        from mistralai import Mistral
+        try:
+            from mistralai import Mistral
+        except ImportError:
+            raise ImportError(
+                "The Mistral provider requires the mistralai package. "
+                "Install it with: pip install aevyra-verdict[mistral]"
+            )
 
         self._client = Mistral(
             api_key=api_key or os.environ.get("MISTRAL_API_KEY"),

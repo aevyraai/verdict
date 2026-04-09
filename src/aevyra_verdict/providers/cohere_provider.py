@@ -37,7 +37,13 @@ class CohereProvider(Provider):
         **kwargs: Any,
     ):
         super().__init__(model=model, api_key=api_key, base_url=base_url, **kwargs)
-        import cohere
+        try:
+            import cohere
+        except ImportError:
+            raise ImportError(
+                "The Cohere provider requires the cohere package. "
+                "Install it with: pip install aevyra-verdict[cohere]"
+            )
 
         client_kwargs = {"api_key": api_key or os.environ.get("COHERE_API_KEY")}
         if base_url:
