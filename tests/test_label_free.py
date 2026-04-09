@@ -65,9 +65,9 @@ def _mock_provider(response_text: str = "test response"):
     provider.model = "mock-model"
     provider.complete.return_value = CompletionResult(
         text=response_text,
-        input_tokens=10,
-        output_tokens=5,
         model="mock-model",
+        provider="mock",
+        usage={"prompt_tokens": 10, "completion_tokens": 5},
     )
     return provider
 
@@ -81,9 +81,9 @@ def _mock_judge_provider(score_json: str = '{"score": 4, "reasoning": "Good resp
     provider.model = "mock-judge-model"
     provider.complete.return_value = CompletionResult(
         text=score_json,
-        input_tokens=20,
-        output_tokens=10,
         model="mock-judge-model",
+        provider="mock_judge",
+        usage={"prompt_tokens": 20, "completion_tokens": 10},
     )
     return provider
 
