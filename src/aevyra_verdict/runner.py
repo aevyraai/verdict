@@ -172,6 +172,16 @@ class EvalRunner:
         if not self.metrics:
             raise ValueError("No metrics added. Call add_metric() first.")
 
+        # Fail fast if reference-based metrics are paired with a label-free dataset.
+        if not dataset.has_ideals():
+            needs_ideal = [m.name for m in self.metrics if getattr(m, "requires_ideal", False)]
+            if needs_ideal:
+                raise ValueError(
+                    f"The following metrics require reference answers (ideal), but the dataset "
+                    f"has none: {needs_ideal}. Either supply a labelled dataset or replace these "
+                    f"metrics with LLMJudge for label-free evaluation."
+                )
+
         all_model_results: dict[str, ModelResult] = {}
 
         with ThreadPoolExecutor(max_workers=self.config.max_model_workers) as model_pool:

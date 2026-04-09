@@ -38,6 +38,12 @@ class Metric(ABC):
     """Abstract base class for eval metrics."""
 
     name: str
+    requires_ideal: bool = False
+    """If True, this metric cannot score without a reference answer.
+
+    Used by EvalRunner to validate that a labelled dataset is provided before
+    running, rather than silently returning zero scores for every sample.
+    """
 
     @abstractmethod
     def score(

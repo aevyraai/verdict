@@ -8,14 +8,21 @@ interpretation. For human-facing documentation see README.md.
 
 ## Install
 
+Provider SDKs are optional extras. Install only what you need:
+
 ```bash
-pip install aevyra-verdict
+pip install aevyra-verdict[openai]      # OpenAI + OpenRouter + local (Ollama/vLLM)
+pip install aevyra-verdict[anthropic]   # Anthropic
+pip install aevyra-verdict[google]      # Google Gemini
+pip install aevyra-verdict[mistral]     # Mistral
+pip install aevyra-verdict[cohere]      # Cohere
+pip install aevyra-verdict[all]         # everything
 ```
 
 Or in development:
 
 ```bash
-pip install -e .
+pip install -e ".[all,dev]"
 ```
 
 ---
@@ -148,13 +155,21 @@ print(result.usage)        # {"prompt_tokens": N, "completion_tokens": N}
 ```python
 from aevyra_verdict import RougeScore, BleuScore, ExactMatch, LLMJudge, CustomMetric
 
-runner.add_metric(RougeScore())   # requires ideal answers
-runner.add_metric(BleuScore())    # requires ideal answers
-runner.add_metric(ExactMatch())   # requires ideal answers
+runner.add_metric(RougeScore())   # requires ideal answers (requires_ideal=True)
+runner.add_metric(BleuScore())    # requires ideal answers (requires_ideal=True)
+runner.add_metric(ExactMatch())   # requires ideal answers (requires_ideal=True)
 
-# LLM-as-judge (no ideal answer required)
+# LLM-as-judge (no ideal answer required, requires_ideal=False)
 judge = get_provider("openai", "gpt-5.4")
 runner.add_metric(LLMJudge(judge_provider=judge))
+
+# Multi-dimensional judge — scores each dimension in one API call
+runner.add_metric(LLMJudge(
+    judge_provider=judge,
+    dimensions=["clarity", "accuracy", "conciseness"],
+))
+# result.score      → mean across dimensions
+# result.sub_scores → {"clarity": 0.8, "accuracy": 0.6, "conciseness": 1.0}
 
 # Custom judge prompt
 runner.add_metric(LLMJudge(
@@ -176,10 +191,43 @@ runner.add_metric(CustomMetric("keyword_check", my_metric))
 ### Decision rules for metric selection
 
 - Dataset **has ideal answers** → use `RougeScore` as baseline; add `LLMJudge` for quality
-- Dataset **has no ideal answers** → use `LLMJudge` only
+- Dataset **has no ideal answers** → use `LLMJudge` only (using a `requires_ideal` metric raises `ValueError`)
 - Task is **exact / factual** (math, code, classification) → prefer `ExactMatch` or `RougeScore`
 - Task is **generative / creative** → prefer `LLMJudge`
+- Need **multi-dimensional scoring** → use `LLMJudge(dimensions=[...])`
 - Need **task-specific scoring** → use `CustomMetric`
+
+### Label-free evaluation
+
+When the dataset has no `ideal` answers, call `runner.run()` with only `LLMJudge` or `CustomMetric`. The runner checks `metric.requires_ideal` against `dataset.has_ideals()` at the start of `run()` and raises a `ValueError` naming each offending metric before any API calls are made.
+
+```python
+ds = Dataset.from_list([
+    {"messages": [{"role": "user", "content": "Explain recursion briefly."}]},
+    {"messages": [{"role": "user", "content": "What is a REST API?"}]},
+])
+# ds.has_ideals() → False
+
+judge = get_provider("openai", "gpt-5.4")
+
+runner = EvalRunner()
+runner.add_provider("openai", "gpt-5.4-nano")
+runner.add_metric(LLMJudge(judge_provider=judge))
+results = runner.run(ds)  # no ideal answers required
+```
+
+To declare that your own custom metric requires labels, set `requires_ideal = True` on the class:
+
+```python
+class MyReferenceMetric(Metric):
+    name = "my_metric"
+    requires_ideal = True  # runner will validate before running
+
+    def score(self, response, ideal=None, messages=None, **kwargs):
+        if ideal is None:
+            raise ValueError("my_metric requires an ideal response")
+        ...
+```
 
 ---
 
@@ -259,8 +307,8 @@ results = runner.run(ds)  # correct
 **Don't use reference-based metrics without ideal answers:**
 ```python
 ds = Dataset.from_list([{"messages": [...]}])  # no ideal field
-runner.add_metric(RougeScore())  # scores will all be 0.0 or None
-# Use LLMJudge instead when there are no reference answers
+runner.add_metric(RougeScore())
+runner.run(ds)  # raises ValueError: "rouge" requires ideal answers — use LLMJudge instead
 ```
 
 **Don't add your own retry logic around run():**
