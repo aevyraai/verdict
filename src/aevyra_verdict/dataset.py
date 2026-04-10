@@ -327,7 +327,9 @@ class Dataset:
                 conversations.append(Conversation.from_dict(normalized))
 
         dataset_name = name or path.stem
-        return cls(conversations=conversations, name=dataset_name)
+        ds = cls(conversations=conversations, name=dataset_name)
+        ds._source_path = str(path.resolve())
+        return ds
 
     @classmethod
     def from_list(
