@@ -19,6 +19,7 @@ Supported input formats:
   - sharegpt  : {"conversations": [{"from": "human", "value": "..."}]}
   - alpaca    : {"instruction": "...", "input": "...", "output": "..."}
   - auto      : detect format from the first record (default)
+  - custom    : any JSONL — specify input_field and output_field to map fields
 """
 
 from __future__ import annotations
@@ -28,7 +29,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Literal
 
-Format = Literal["auto", "openai", "sharegpt", "alpaca"]
+Format = Literal["auto", "openai", "sharegpt", "alpaca", "custom"]
 
 
 @dataclass
@@ -104,7 +105,8 @@ def _detect_format(record: dict[str, Any]) -> Format:
     raise ValueError(
         "Could not detect dataset format. Expected one of: "
         "'messages' (OpenAI), 'conversations' (ShareGPT), or 'instruction' (Alpaca). "
-        "Pass format= explicitly if your dataset uses a non-standard structure."
+        f"Found fields: {', '.join(sorted(record.keys()))}. "
+        "Use --input-field and --output-field to map your fields directly."
     )
 
 
@@ -180,7 +182,53 @@ def _convert_alpaca(record: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def _normalize(record: dict[str, Any], fmt: Format) -> dict[str, Any]:
+def _convert_custom(
+    record: dict[str, Any],
+    input_field: str,
+    output_field: str | None,
+) -> dict[str, Any]:
+    """Convert an arbitrary record to OpenAI format using explicit field mapping.
+
+    The value at ``input_field`` becomes the user message content.
+    The value at ``output_field`` (if given) becomes the ideal reference answer —
+    if the value is a dict or list it is JSON-serialised so downstream metrics
+    can unpack it however they like.
+    All other fields are preserved as metadata.
+    """
+    if input_field not in record:
+        keys = ", ".join(sorted(record.keys()))
+        raise ValueError(
+            f"Input field '{input_field}' not found in record. Available fields: {keys}"
+        )
+
+    user_content = str(record[input_field])
+
+    ideal: str | None = None
+    if output_field is not None:
+        if output_field not in record:
+            keys = ", ".join(sorted(record.keys()))
+            raise ValueError(
+                f"Output field '{output_field}' not found in record. Available fields: {keys}"
+            )
+        raw = record[output_field]
+        ideal = json.dumps(raw) if isinstance(raw, (dict, list)) else str(raw)
+
+    skip = {input_field, output_field} - {None}
+    metadata = {k: v for k, v in record.items() if k not in skip}
+
+    return {
+        "messages": [{"role": "user", "content": user_content}],
+        "ideal": ideal,
+        "metadata": metadata,
+    }
+
+
+def _normalize(
+    record: dict[str, Any],
+    fmt: Format,
+    input_field: str | None = None,
+    output_field: str | None = None,
+) -> dict[str, Any]:
     """Convert a raw record to OpenAI format based on the given format."""
     if fmt == "openai":
         return record
@@ -188,6 +236,10 @@ def _normalize(record: dict[str, Any], fmt: Format) -> dict[str, Any]:
         return _convert_sharegpt(record)
     if fmt == "alpaca":
         return _convert_alpaca(record)
+    if fmt == "custom":
+        if not input_field:
+            raise ValueError("input_field is required when format='custom'.")
+        return _convert_custom(record, input_field, output_field)
     raise ValueError(f"Unknown format: {fmt!r}")
 
 
@@ -223,17 +275,29 @@ class Dataset:
         path: str | Path,
         name: str | None = None,
         format: Format = "auto",
+        input_field: str | None = None,
+        output_field: str | None = None,
     ) -> Dataset:
         """Load a dataset from a JSONL file.
 
         Args:
             path: Path to the JSONL file.
             name: Display name for the dataset. Defaults to the filename stem.
-            format: Input format — "auto" (detect), "openai", "sharegpt", or "alpaca".
+            format: Input format — "auto" (detect), "openai", "sharegpt", "alpaca",
+                or "custom". When "custom", use ``input_field`` and ``output_field``
+                to map arbitrary fields to the user message and ideal answer.
+            input_field: Field name to use as the user message (required for
+                format="custom").
+            output_field: Field name to use as the ideal/reference answer (optional
+                for format="custom"; omit for label-free datasets).
         """
         path = Path(path)
         if not path.exists():
             raise FileNotFoundError(f"Dataset file not found: {path}")
+
+        # If field mapping is given, switch to custom format automatically
+        if input_field and format == "auto":
+            format = "custom"
 
         conversations = []
         detected_format: Format | None = None
@@ -253,7 +317,7 @@ class Dataset:
                     detected_format = _detect_format(data) if format == "auto" else format
 
                 try:
-                    normalized = _normalize(data, detected_format)
+                    normalized = _normalize(data, detected_format, input_field, output_field)
                 except Exception as e:
                     raise ValueError(f"Failed to parse line {line_num}: {e}") from e
 
@@ -271,20 +335,28 @@ class Dataset:
         items: list[dict[str, Any]],
         name: str = "inline",
         format: Format = "auto",
+        input_field: str | None = None,
+        output_field: str | None = None,
     ) -> Dataset:
         """Create a dataset from a list of dicts.
 
         Args:
-            items: List of records in OpenAI, ShareGPT, or Alpaca format.
+            items: List of records in OpenAI, ShareGPT, Alpaca, or custom format.
             name: Display name for the dataset.
-            format: Input format — "auto" (detect), "openai", "sharegpt", or "alpaca".
+            format: Input format — "auto" (detect), "openai", "sharegpt", "alpaca",
+                or "custom".
+            input_field: Field name to use as the user message (for format="custom").
+            output_field: Field name to use as the ideal answer (for format="custom").
         """
+        if input_field and format == "auto":
+            format = "custom"
+
         detected_format: Format | None = None
         conversations = []
         for item in items:
             if detected_format is None:
                 detected_format = _detect_format(item) if format == "auto" else format
-            normalized = _normalize(item, detected_format)
+            normalized = _normalize(item, detected_format, input_field, output_field)
             if normalized.get("messages"):
                 conversations.append(Conversation.from_dict(normalized))
         return cls(conversations=conversations, name=name)
