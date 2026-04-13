@@ -16,10 +16,26 @@
 
 from __future__ import annotations
 
+import logging
 import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Any
+
+logger = logging.getLogger(__name__)
+
+_RETRY_DELAYS = [5, 10, 20, 40, 60]  # seconds between attempts
+
+
+def _is_retryable(exc: BaseException) -> bool:
+    """Return True if the exception is a transient rate-limit or overload error."""
+    status = getattr(exc, "status_code", None) or getattr(exc, "status", None)
+    if status in (429, 529):
+        return True
+    # anthropic.OverloadedError has no status_code attr on older SDK versions
+    if type(exc).__name__ in ("OverloadedError", "RateLimitError"):
+        return True
+    return False
 
 
 @dataclass
@@ -77,11 +93,29 @@ class Provider(ABC):
         *args,
         **kwargs,
     ) -> tuple[Any, float]:
-        """Helper to time a completion call. Returns (result, latency_ms)."""
-        start = time.perf_counter()
-        result = fn(*args, **kwargs)
-        latency_ms = (time.perf_counter() - start) * 1000
-        return result, latency_ms
+        """Helper to time a completion call. Returns (result, latency_ms).
+
+        Automatically retries on transient rate-limit (429) and overload (529)
+        errors with exponential backoff. Raises on the final attempt.
+        """
+        for attempt, delay in enumerate(_RETRY_DELAYS + [None]):
+            start = time.perf_counter()
+            try:
+                result = fn(*args, **kwargs)
+                latency_ms = (time.perf_counter() - start) * 1000
+                return result, latency_ms
+            except Exception as exc:
+                if not _is_retryable(exc) or delay is None:
+                    raise
+                logger.warning(
+                    "%s %s (attempt %d/%d): %s — retrying in %ds",
+                    self.__class__.__name__, self.model,
+                    attempt + 1, len(_RETRY_DELAYS),
+                    type(exc).__name__, delay,
+                )
+                time.sleep(delay)
+
+        raise RuntimeError("unreachable")
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}(model={self.model!r})"
