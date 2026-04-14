@@ -57,7 +57,7 @@ aevyra-verdict run examples/sample_data.jsonl \
 
 # 3. Compare two local Ollama models (no API key needed)
 aevyra-verdict run examples/sample_data.jsonl \
-  -m local/llama3.1 \
+  -m local/llama3.1:8b \
   -m local/mistral \
   --base-url http://localhost:11434/v1 \
   -o results.json
