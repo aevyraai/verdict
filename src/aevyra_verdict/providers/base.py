@@ -75,6 +75,7 @@ class Provider(ABC):
         self.api_key = api_key
         self.base_url = base_url
         self.extra_kwargs = kwargs
+        self.tokens_used: int = 0  # cumulative across all complete() calls
 
     @abstractmethod
     def complete(
@@ -103,6 +104,8 @@ class Provider(ABC):
             try:
                 result = fn(*args, **kwargs)
                 latency_ms = (time.perf_counter() - start) * 1000
+                if hasattr(result, "total_tokens"):
+                    self.tokens_used += result.total_tokens
                 return result, latency_ms
             except Exception as exc:
                 if not _is_retryable(exc) or delay is None:
