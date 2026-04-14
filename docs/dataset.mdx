@@ -5,8 +5,9 @@ description: Loading and working with eval datasets.
 
 ## Supported formats
 
-aevyra-verdict auto-detects the format from the first record. Pass `format=` explicitly
-if you need to override.
+aevyra-verdict accepts JSONL and CSV files. JSONL auto-detects the format from the first
+record — pass `format=` explicitly to override. CSV uses `from_csv()` with configurable
+column names.
 
 <Tabs>
   <Tab title="OpenAI">
@@ -65,6 +66,31 @@ if you need to override.
     Alpaca template. `output` becomes the `ideal` reference answer. A `system` field is
     extracted as a system message if present. `input` can be omitted for instruction-only samples.
   </Tab>
+
+  <Tab title="CSV">
+    Simplest format for tabular data. Column names default to `input` and `ideal`:
+
+    ```
+    input,ideal
+    "What is the capital of France?","Paris"
+    "Explain binary search in one sentence.","Binary search repeatedly halves a sorted array..."
+    ```
+
+    Use `from_csv()` with optional column overrides:
+
+    ```python
+    # Default column names (input, ideal)
+    dataset = Dataset.from_csv("data.csv")
+
+    # Custom column names
+    dataset = Dataset.from_csv("data.csv", input_field="article", output_field="summary")
+
+    # Label-free (no reference answers)
+    dataset = Dataset.from_csv("data.csv", output_field=None)
+    ```
+
+    Missing columns raise a clear error listing the available column names.
+  </Tab>
 </Tabs>
 
 ## Loading
@@ -72,12 +98,21 @@ if you need to override.
 ```python
 from aevyra_verdict import Dataset
 
-# Auto-detect format (default)
+# JSONL — auto-detect format (default)
 dataset = Dataset.from_jsonl("data.jsonl")
 
-# Explicit format
+# JSONL — explicit format
 dataset = Dataset.from_jsonl("sharegpt_data.jsonl", format="sharegpt")
 dataset = Dataset.from_jsonl("alpaca_data.jsonl", format="alpaca")
+
+# CSV — default column names (input, ideal)
+dataset = Dataset.from_csv("data.csv")
+
+# CSV — custom column names
+dataset = Dataset.from_csv("data.csv", input_field="article", output_field="summary")
+
+# CSV — label-free (no reference answers)
+dataset = Dataset.from_csv("data.csv", output_field=None)
 
 print(dataset.summary())
 # {'name': 'data', 'num_conversations': 50, 'has_ideals': True, 'metadata_keys': ['category']}
