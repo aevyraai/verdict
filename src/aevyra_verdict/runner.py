@@ -257,12 +257,15 @@ class EvalRunner:
             return idx, completion, sample_scores, error
 
         p1_desc = f"  {label}" + (" (completions)" if _has_judge_metrics else "")
-        progress = tqdm(total=n, desc=p1_desc, file=sys.stderr) if (show_progress and tqdm is not None) else None
+        progress = (
+            tqdm(total=n, desc=p1_desc, file=sys.stderr)
+            if (show_progress and tqdm is not None)
+            else None
+        )
 
         with ThreadPoolExecutor(max_workers=self.config.max_workers) as pool:
             futures = [
-                pool.submit(get_completion_and_score, idx, conv)
-                for idx, conv in enumerate(dataset)
+                pool.submit(get_completion_and_score, idx, conv) for idx, conv in enumerate(dataset)
             ]
             for future in as_completed(futures):
                 idx, completion, sample_scores, error = future.result()
@@ -277,6 +280,7 @@ class EvalRunner:
 
         # --- Pass 2: run judge metrics in parallel across all samples ---
         if _judge_metrics:
+
             def score_sample(idx: int):
                 completion = completions[idx]
                 if completion is None:
@@ -299,7 +303,11 @@ class EvalRunner:
                 return idx, judge_scores
 
             p2_desc = f"  {label} (scoring)"
-            progress2 = tqdm(total=n, desc=p2_desc, file=sys.stderr) if (show_progress and tqdm is not None) else None
+            progress2 = (
+                tqdm(total=n, desc=p2_desc, file=sys.stderr)
+                if (show_progress and tqdm is not None)
+                else None
+            )
 
             with ThreadPoolExecutor(max_workers=self.config.max_workers) as pool:
                 judge_futures = [pool.submit(score_sample, idx) for idx in range(n)]

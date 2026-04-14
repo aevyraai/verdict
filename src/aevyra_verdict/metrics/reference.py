@@ -111,6 +111,7 @@ class RougeScore(Metric):
         import io
         import contextlib
         from rouge_score import rouge_scorer
+
         with contextlib.redirect_stdout(io.StringIO()):
             self._scorer = rouge_scorer.RougeScorer([self.variant], use_stemmer=True)
 

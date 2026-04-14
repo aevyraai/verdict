@@ -112,9 +112,12 @@ class Provider(ABC):
                     raise
                 logger.warning(
                     "%s %s (attempt %d/%d): %s — retrying in %ds",
-                    self.__class__.__name__, self.model,
-                    attempt + 1, len(_RETRY_DELAYS),
-                    type(exc).__name__, delay,
+                    self.__class__.__name__,
+                    self.model,
+                    attempt + 1,
+                    len(_RETRY_DELAYS),
+                    type(exc).__name__,
+                    delay,
                 )
                 time.sleep(delay)
 

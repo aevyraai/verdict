@@ -360,7 +360,11 @@ class Dataset:
             if reader.fieldnames is None:
                 raise ValueError(f"CSV file appears to be empty: {path}")
 
-            missing = [c for c in ([input_field] + ([output_field] if output_field else [])) if c not in reader.fieldnames]
+            missing = [
+                c
+                for c in ([input_field] + ([output_field] if output_field else []))
+                if c not in reader.fieldnames
+            ]
             if missing:
                 raise ValueError(
                     f"Column(s) {missing} not found in CSV. "
