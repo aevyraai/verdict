@@ -107,6 +107,13 @@ class RougeScore(Metric):
         variant: Which ROUGE variant to use. One of "rouge1", "rouge2", "rougeL".
         """
         self.variant = variant
+        # Instantiate once to avoid "Using default tokenizer." printing on every call
+        import io
+        import contextlib
+        from rouge_score import rouge_scorer
+
+        with contextlib.redirect_stdout(io.StringIO()):
+            self._scorer = rouge_scorer.RougeScorer([self.variant], use_stemmer=True)
 
     def score(
         self,
@@ -118,10 +125,7 @@ class RougeScore(Metric):
         if ideal is None:
             raise ValueError("ROUGE requires an ideal (reference) response")
 
-        from rouge_score import rouge_scorer
-
-        scorer = rouge_scorer.RougeScorer([self.variant], use_stemmer=True)
-        scores = scorer.score(ideal, response)
+        scores = self._scorer.score(ideal, response)
 
         result = scores[self.variant]
         return ScoreResult(

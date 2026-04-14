@@ -99,6 +99,11 @@ class LLMJudge(Metric):
 
     name = "llm_judge"
 
+    @property
+    def judge_tokens_used(self) -> int:
+        """Total tokens consumed by the judge provider across all score() calls."""
+        return getattr(self.judge, "tokens_used", 0)
+
     def __init__(
         self,
         judge_provider: Provider,

@@ -215,22 +215,32 @@ class EvalRunner:
         dataset: Dataset,
         show_progress: bool,
     ) -> ModelResult:
-        """Run all conversations against a single model, concurrently."""
+        """Run all conversations against a single model, concurrently.
+
+        Uses a two-pass approach when any metric makes its own API calls (e.g.
+        LLMJudge): first collect all completions in parallel, then score all
+        samples in parallel. This prevents judge calls from blocking student
+        completion slots and allows both to run at full concurrency.
+        """
         n = len(dataset)
         completions: list[CompletionResult | None] = [None] * n
         scores: list[dict[str, ScoreResult]] = [{} for _ in range(n)]
         errors: list[str | None] = [None] * n
 
-        progress = None
-        if show_progress and tqdm is not None:
-            progress = tqdm(total=n, desc=f"  {label}", file=sys.stderr)
+        # Detect whether any metric makes external API calls (has a judge provider).
+        # For these metrics we run scoring in a separate parallel pass so judge
+        # calls don't serialize behind student completion slots.
+        _has_judge_metrics = any(hasattr(m, "judge") for m in self.metrics)
+        _cheap_metrics = [m for m in self.metrics if not hasattr(m, "judge")]
+        _judge_metrics = [m for m in self.metrics if hasattr(m, "judge")]
 
-        def process_sample(idx: int, conversation: Conversation):
+        # --- Pass 1: collect completions (and run cheap metrics inline) ---
+        def get_completion_and_score(idx: int, conversation: Conversation):
             completion, error = self._get_completion(provider, conversation)
             sample_scores: dict[str, ScoreResult] = {}
 
             if completion and not error:
-                for metric in self.metrics:
+                for metric in _cheap_metrics:
                     try:
                         sample_scores[metric.name] = metric.score(
                             response=completion.text,
@@ -246,8 +256,17 @@ class EvalRunner:
 
             return idx, completion, sample_scores, error
 
+        p1_desc = f"  {label}" + (" (completions)" if _has_judge_metrics else "")
+        progress = (
+            tqdm(total=n, desc=p1_desc, file=sys.stderr)
+            if (show_progress and tqdm is not None)
+            else None
+        )
+
         with ThreadPoolExecutor(max_workers=self.config.max_workers) as pool:
-            futures = [pool.submit(process_sample, idx, conv) for idx, conv in enumerate(dataset)]
+            futures = [
+                pool.submit(get_completion_and_score, idx, conv) for idx, conv in enumerate(dataset)
+            ]
             for future in as_completed(futures):
                 idx, completion, sample_scores, error = future.result()
                 completions[idx] = completion
@@ -258,6 +277,48 @@ class EvalRunner:
 
         if progress is not None:
             progress.close()
+
+        # --- Pass 2: run judge metrics in parallel across all samples ---
+        if _judge_metrics:
+
+            def score_sample(idx: int):
+                completion = completions[idx]
+                if completion is None:
+                    return idx, {}
+                conversation = dataset.conversations[idx]
+                judge_scores: dict[str, ScoreResult] = {}
+                for metric in _judge_metrics:
+                    try:
+                        judge_scores[metric.name] = metric.score(
+                            response=completion.text,
+                            ideal=conversation.ideal,
+                            messages=conversation.prompt_messages,
+                        )
+                    except Exception as e:
+                        judge_scores[metric.name] = ScoreResult(
+                            score=0.0,
+                            metric_name=metric.name,
+                            details={"error": str(e)},
+                        )
+                return idx, judge_scores
+
+            p2_desc = f"  {label} (scoring)"
+            progress2 = (
+                tqdm(total=n, desc=p2_desc, file=sys.stderr)
+                if (show_progress and tqdm is not None)
+                else None
+            )
+
+            with ThreadPoolExecutor(max_workers=self.config.max_workers) as pool:
+                judge_futures = [pool.submit(score_sample, idx) for idx in range(n)]
+                for future in as_completed(judge_futures):
+                    idx, judge_scores = future.result()
+                    scores[idx].update(judge_scores)
+                    if progress2 is not None:
+                        progress2.update(1)
+
+            if progress2 is not None:
+                progress2.close()
 
         return ModelResult(
             label=label,

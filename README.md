@@ -125,7 +125,17 @@ flowchart LR
 
 ### Dataset format
 
-Three formats are supported. The format is auto-detected from the first record.
+Four formats are supported. JSONL and CSV files are both accepted.
+
+**CSV** — simplest format for tabular data. Column names default to `input` and `ideal`:
+
+```python
+dataset = Dataset.from_csv("data.csv")                                      # input + ideal columns
+dataset = Dataset.from_csv("data.csv", input_field="article", output_field="summary")  # custom columns
+dataset = Dataset.from_csv("data.csv", output_field=None)                   # label-free
+```
+
+For JSONL, the format is auto-detected from the first record.
 
 **OpenAI** (native):
 
