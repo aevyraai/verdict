@@ -332,6 +332,61 @@ class Dataset:
         return ds
 
     @classmethod
+    def from_csv(
+        cls,
+        path: str | Path,
+        name: str | None = None,
+        input_field: str = "input",
+        output_field: str | None = "ideal",
+    ) -> "Dataset":
+        """Load a dataset from a CSV file.
+
+        Args:
+            path: Path to the CSV file.
+            name: Display name for the dataset. Defaults to the filename stem.
+            input_field: Column name to use as the user message. Defaults to "input".
+            output_field: Column name to use as the ideal/reference answer.
+                Defaults to "ideal". Pass None for label-free datasets.
+        """
+        import csv as _csv
+
+        path = Path(path)
+        if not path.exists():
+            raise FileNotFoundError(f"Dataset file not found: {path}")
+
+        conversations = []
+        with open(path, newline="") as f:
+            reader = _csv.DictReader(f)
+            if reader.fieldnames is None:
+                raise ValueError(f"CSV file appears to be empty: {path}")
+
+            missing = [c for c in ([input_field] + ([output_field] if output_field else [])) if c not in reader.fieldnames]
+            if missing:
+                raise ValueError(
+                    f"Column(s) {missing} not found in CSV. "
+                    f"Available columns: {list(reader.fieldnames)}. "
+                    f"Use --input-field / --output-field to specify the correct column names."
+                )
+
+            for row_num, row in enumerate(reader, 2):  # row 1 is header
+                content = row.get(input_field, "").strip()
+                if not content:
+                    continue
+                ideal = row.get(output_field, "").strip() if output_field else None
+                normalized: dict = {"messages": [{"role": "user", "content": content}]}
+                if ideal:
+                    normalized["ideal"] = ideal
+                try:
+                    conversations.append(Conversation.from_dict(normalized))
+                except Exception as e:
+                    raise ValueError(f"Failed to parse CSV row {row_num}: {e}") from e
+
+        dataset_name = name or path.stem
+        ds = cls(conversations=conversations, name=dataset_name)
+        ds._source_path = str(path.resolve())
+        return ds
+
+    @classmethod
     def from_list(
         cls,
         items: list[dict[str, Any]],
