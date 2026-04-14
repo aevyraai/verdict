@@ -61,6 +61,11 @@ ds = Dataset.from_jsonl("data.jsonl")
 ds = Dataset.from_jsonl("sharegpt.jsonl", format="sharegpt")
 ds = Dataset.from_jsonl("alpaca.jsonl", format="alpaca")
 
+# CSV — defaults to input/ideal column names
+ds = Dataset.from_csv("data.csv")
+ds = Dataset.from_csv("data.csv", input_field="question", output_field="answer")
+ds = Dataset.from_csv("data.csv", output_field=None)   # label-free
+
 # From a list in memory
 ds = Dataset.from_list([
     {"messages": [{"role": "user", "content": "Hi"}], "ideal": "Hello"},
@@ -74,6 +79,14 @@ ds = Dataset.from_list([
 | `openai` | `messages` (array of `{role, content}`) | `ideal` field |
 | `sharegpt` | `conversations` (array of `{from, value}`) | Last `gpt`/`assistant` turn |
 | `alpaca` | `instruction` + optional `input` | `output` field |
+| CSV | `input` column (default) | `ideal` column (default); use `output_field=None` for label-free |
+
+For JSONL with non-standard field names, pass `input_field` and `output_field`:
+
+```python
+ds = Dataset.from_jsonl("data.jsonl", input_field="question", output_field="answer")
+ds = Dataset.from_jsonl("data.jsonl", input_field="prompt", output_field=None)  # label-free
+```
 
 ### Filtering
 

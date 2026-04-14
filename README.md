@@ -2,6 +2,8 @@
 
 [![CI](https://github.com/aevyraai/verdict/actions/workflows/ci.yml/badge.svg)](https://github.com/aevyraai/verdict/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/aevyra-verdict.svg)](https://pypi.org/project/aevyra-verdict/)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![Docs](https://img.shields.io/badge/docs-aevyra.mintlify.app-7B5CF8)](https://aevyra.mintlify.app/verdict)
 
 Benchmark any LLM against your data. Pick the best model, then make it better.
 
@@ -55,7 +57,7 @@ aevyra-verdict run examples/sample_data.jsonl \
 
 # 3. Compare two local Ollama models (no API key needed)
 aevyra-verdict run examples/sample_data.jsonl \
-  -m local/llama3.1 \
+  -m local/llama3.1:8b \
   -m local/mistral \
   --base-url http://localhost:11434/v1 \
   -o results.json
