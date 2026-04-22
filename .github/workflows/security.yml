@@ -104,20 +104,16 @@ jobs:
 
       - name: Scan for secrets
         run: |
-          if [ -f .secrets.baseline ]; then
-            detect-secrets scan | python - <<'EOF'
-          import sys, json
-          data = json.load(sys.stdin)
+          detect-secrets scan > /tmp/secrets-scan.json
+          python3 - <<'EOF'
+          import json, sys
+          data = json.load(open("/tmp/secrets-scan.json"))
           results = data.get("results", {})
           if results:
-              print("New secrets detected — update .secrets.baseline or remove the secrets.")
+              print("Secrets detected — remove them or add a .secrets.baseline to allowlist false positives.")
               for f, findings in results.items():
                   for s in findings:
                       print(f"  {f}:{s['line_number']} ({s['type']})")
               sys.exit(1)
+          print("No secrets found.")
           EOF
-          else
-            detect-secrets scan > .secrets.baseline
-            echo "No .secrets.baseline found — generated one. Commit it to enable incremental scanning."
-            cat .secrets.baseline
-          fi
