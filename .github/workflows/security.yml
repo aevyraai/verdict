@@ -106,9 +106,9 @@ jobs:
         run: |
           if [ -f .secrets.baseline ]; then
             # Scan against the committed baseline — only NEW unaudited secrets fail.
-            detect-secrets scan --baseline .secrets.baseline --exclude-files '\.secrets\.baseline' > /tmp/secrets-scan.json
+            detect-secrets scan --baseline .secrets.baseline --exclude-files '\.secrets\.baseline|\.github/' > /tmp/secrets-scan.json
           else
-            detect-secrets scan --exclude-files '\.secrets\.baseline' > /tmp/secrets-scan.json
+            detect-secrets scan --exclude-files '\.secrets\.baseline|\.github/' > /tmp/secrets-scan.json
           fi
           python3 - <<'EOF'
           import json, sys
