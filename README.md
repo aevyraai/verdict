@@ -1,6 +1,7 @@
 # aevyra-verdict
 
 [![CI](https://github.com/aevyraai/verdict/actions/workflows/ci.yml/badge.svg)](https://github.com/aevyraai/verdict/actions/workflows/ci.yml)
+[![Security](https://github.com/aevyraai/verdict/actions/workflows/security.yml/badge.svg)](https://github.com/aevyraai/verdict/actions/workflows/security.yml)
 [![PyPI](https://img.shields.io/pypi/v/aevyra-verdict.svg)](https://pypi.org/project/aevyra-verdict/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Docs](https://img.shields.io/badge/docs-aevyra.mintlify.app-7B5CF8)](https://aevyra.mintlify.app/verdict)
@@ -355,7 +356,7 @@ models:
   - provider: openai
     model: meta-llama/Llama-3.1-8B-Instruct
     base_url: http://localhost:8000/v1
-    api_key: "none"
+    api_key: "none"  # pragma: allowlist secret
     label: llama-local
 ```
 

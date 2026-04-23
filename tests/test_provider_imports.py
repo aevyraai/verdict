@@ -46,37 +46,38 @@ class TestProviderImportErrors(unittest.TestCase):
     def test_openai_provider_missing_sdk(self):
         with _block("openai"):
             with self.assertRaises(ImportError) as ctx:
-                OpenAIProvider(model="gpt-5.4-nano", api_key="test")
+                OpenAIProvider(model="gpt-5.4-nano", api_key="test")  # pragma: allowlist secret
         self._assert_helpful_error(ctx.exception, "openai")
 
     def test_openrouter_provider_missing_sdk(self):
         with _block("openai"):
             with self.assertRaises(ImportError) as ctx:
-                OpenRouterProvider(model="openai/gpt-5.4-nano", api_key="test")
+                dummy_key = "test"  # pragma: allowlist secret
+                OpenRouterProvider(model="openai/gpt-5.4-nano", api_key=dummy_key)
         self._assert_helpful_error(ctx.exception, "openai")
 
     def test_anthropic_provider_missing_sdk(self):
         with _block("anthropic"):
             with self.assertRaises(ImportError) as ctx:
-                AnthropicProvider(model="claude-haiku", api_key="test")
+                AnthropicProvider(model="claude-haiku", api_key="test")  # pragma: allowlist secret
         self._assert_helpful_error(ctx.exception, "anthropic")
 
     def test_google_provider_missing_sdk(self):
         with _block("google"):
             with self.assertRaises(ImportError) as ctx:
-                GoogleProvider(model="gemini-2.0-flash", api_key="test")
+                GoogleProvider(model="gemini-2.0-flash", api_key="test")  # pragma: allowlist secret
         self._assert_helpful_error(ctx.exception, "google")
 
     def test_mistral_provider_missing_sdk(self):
         with _block("mistralai"):
             with self.assertRaises(ImportError) as ctx:
-                MistralProvider(model="mistral-small", api_key="test")
+                MistralProvider(model="mistral-small", api_key="test")  # pragma: allowlist secret
         self._assert_helpful_error(ctx.exception, "mistral")
 
     def test_cohere_provider_missing_sdk(self):
         with _block("cohere"):
             with self.assertRaises(ImportError) as ctx:
-                CohereProvider(model="command-r", api_key="test")
+                CohereProvider(model="command-r", api_key="test")  # pragma: allowlist secret
         self._assert_helpful_error(ctx.exception, "cohere")
 
 
