@@ -52,7 +52,9 @@ class TestProviderImportErrors(unittest.TestCase):
     def test_openrouter_provider_missing_sdk(self):
         with _block("openai"):
             with self.assertRaises(ImportError) as ctx:
-                OpenRouterProvider(model="openai/gpt-5.4-nano", api_key="test")  # pragma: allowlist secret
+                OpenRouterProvider(
+                    model="openai/gpt-5.4-nano", api_key="test"
+                )  # pragma: allowlist secret
         self._assert_helpful_error(ctx.exception, "openai")
 
     def test_anthropic_provider_missing_sdk(self):
