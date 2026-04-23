@@ -104,26 +104,19 @@ jobs:
 
       - name: Scan for secrets
         run: |
-          if [ -f .secrets.baseline ]; then
-            # Scan against the committed baseline — only NEW unaudited secrets fail.
-            detect-secrets scan --baseline .secrets.baseline --exclude-files '\.secrets\.baseline' --exclude-files '\.github/' > /tmp/secrets-scan.json
-          else
-            detect-secrets scan --exclude-files '\.secrets\.baseline' --exclude-files '\.github/' > /tmp/secrets-scan.json
-          fi
+          detect-secrets scan \
+            --exclude-files '\.secrets\.baseline' \
+            --exclude-files '\.github/' \
+            > /tmp/secrets-scan.json
           python3 - <<'EOF'
           import json, sys
           data = json.load(open("/tmp/secrets-scan.json"))
-          # Only flag secrets that have NOT been audited as false positives.
-          new_secrets = {
-              f: [s for s in findings if not s.get("is_verified") and s.get("is_secret") is not False]
-              for f, findings in data.get("results", {}).items()
-          }
-          new_secrets = {f: v for f, v in new_secrets.items() if v}
-          if new_secrets:
-              print("New secrets detected — remove them or audit .secrets.baseline to allowlist false positives.")
-              for f, findings in new_secrets.items():
+          results = data.get("results", {})
+          if results:
+              print("Secrets detected — add '# pragma: allowlist secret' to false positives.")
+              for f, findings in results.items():
                   for s in findings:
                       print(f"  {f}:{s['line_number']} ({s['type']})")
               sys.exit(1)
-          print("No new secrets found.")
+          print("No secrets found.")
           EOF
