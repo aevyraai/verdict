@@ -356,7 +356,7 @@ models:
   - provider: openai
     model: meta-llama/Llama-3.1-8B-Instruct
     base_url: http://localhost:8000/v1
-    api_key: "none"
+    api_key: "none"  # pragma: allowlist secret
     label: llama-local
 ```
 

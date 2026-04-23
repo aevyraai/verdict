@@ -94,7 +94,7 @@ Any OpenAI-compatible local server works via the `openai` provider with a custom
     - provider: openai
       model: meta-llama/Llama-3.1-8B-Instruct
       base_url: http://localhost:8000/v1
-      api_key: "none"
+      api_key: "none"  # pragma: allowlist secret
       label: llama-local
     ```
   </Tab>
@@ -109,7 +109,7 @@ Any OpenAI-compatible local server works via the `openai` provider with a custom
     - provider: openai
       model: llama3.1
       base_url: http://localhost:11434/v1
-      api_key: "ollama"
+      api_key: "ollama"  # pragma: allowlist secret
       label: llama-ollama
     ```
   </Tab>
